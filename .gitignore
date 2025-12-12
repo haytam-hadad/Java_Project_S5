@@ -1,0 +1,53 @@
+# .gitignore for a Java project (VS Code, Windows)
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# Build output
+/target/
+/build/
+/out/
+
+# Eclipse files
+.classpath
+.project
+.settings/
+bin/
+
+# IntelliJ
+*.iml
+.idea/
+
+# VS Code
+.vscode/
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# Maven
+/target/
+
+# NetBeans
+nbproject/private/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary/backup files
+~$*
+*.tmp
+
+# JVM crash logs
+hs_err_pid*
