@@ -1,4 +1,4 @@
-public abstract class Vehicule {
+public class Vehicule {
     protected String id;   
     protected String marque;
     protected String modele;
@@ -27,8 +27,15 @@ public abstract class Vehicule {
         this.dateVente = dateVente;
     }
 
-    // Methode abstraite calcule selon le type
-    public abstract double calculerPrixFinal();
+    public double calculerPrixFinal() {
+        switch (typeVehicule) {
+            case "BERLINE": return prixVente * 1.15;
+            case "SUV": return prixVente * 1.20;
+            case "CAMION": return prixVente * 1.18;
+            case "ELECTRIQUE": return prixVente * 1.10;
+            default: return prixVente;
+        }
+    }
 
     public String getId() { return id; }
     public String getMarque() { return marque; }
