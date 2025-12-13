@@ -9,7 +9,7 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println(ColorUtil.colorize("═══════════════════════════════════════════════════", ColorUtil.CYAN));
-        System.out.println(ColorUtil.title("   SYSTÈME DE GESTION - CONCESSION VOITURES OCCASION"));
+        System.out.println(ColorUtil.title("   SYSTEME DE GESTION - CONCESSION VOITURES OCCASION"));
         System.out.println(ColorUtil.colorize("═══════════════════════════════════════════════════", ColorUtil.CYAN) + "\n");
         
         // Vérification du mot de passe pour accéder à l'application
@@ -130,16 +130,40 @@ public class Main {
         System.out.println("\n" + ColorUtil.header("--- Ajout d'un véhicule ---"));
         
         System.out.print(ColorUtil.info("Marque: "));
-        String marque = scanner.nextLine();
+        String marque = scanner.nextLine().trim();
+        
+        // Validation: marque non vide
+        if (marque.isEmpty()) {
+            System.out.println(ColorUtil.error("Erreur: La marque ne peut pas être vide!"));
+            return;
+        }
         
         System.out.print(ColorUtil.info("Modèle: "));
-        String modele = scanner.nextLine();
+        String modele = scanner.nextLine().trim();
+        
+        // Validation: modèle non vide
+        if (modele.isEmpty()) {
+            System.out.println(ColorUtil.error("Erreur: Le modèle ne peut pas être vide!"));
+            return;
+        }
         
         System.out.print(ColorUtil.info("Prix d'achat (DH): "));
         double prixAchat = lireDouble();
         
+        // Validation: prix d'achat positif
+        if (prixAchat <= 0) {
+            System.out.println(ColorUtil.error("Erreur: Le prix d'achat doit être positif!"));
+            return;
+        }
+        
         System.out.print(ColorUtil.info("Prix de vente (DH): "));
         double prixVente = lireDouble();
+        
+        // Validation: prix de vente positif
+        if (prixVente <= 0) {
+            System.out.println(ColorUtil.error("Erreur: Le prix de vente doit être positif!"));
+            return;
+        }
         
         // Validation: prix de vente > prix d'achat
         if (prixVente <= prixAchat) {
@@ -162,9 +186,9 @@ public class Main {
         int kilometrage = scanner.nextInt();
         scanner.nextLine();
         
-        // Validation: kilométrage positif
+        // Validation: kilométrage positif ou zéro
         if (kilometrage < 0) {
-            System.out.println(ColorUtil.error("Erreur: Le kilométrage doit être positif!"));
+            System.out.println(ColorUtil.error("Erreur: Le kilométrage doit être positif ou zéro!"));
             return;
         }
         
@@ -175,6 +199,12 @@ public class Main {
         System.out.println(ColorUtil.colorize("4. ", ColorUtil.YELLOW) + "ELECTRIQUE");
         System.out.print(ColorUtil.info("Votre choix: "));
         int typeChoix = lireChoix();
+        
+        // Validation: type de véhicule valide
+        if (typeChoix < 1 || typeChoix > 4) {
+            System.out.println(ColorUtil.error("Erreur: Type invalide! Choisir entre 1 et 4."));
+            return;
+        }
         
         Vehicule vehicule = null;
         
@@ -195,9 +225,6 @@ public class Main {
                 vehicule = new Electrique(null, marque, modele, prixAchat, prixVente, annee, 
                                          kilometrage, "DISPONIBLE", null, null);
                 break;
-            default:
-                System.out.println(ColorUtil.error("Type invalide!"));
-                return;
         }
         
         if (vehiculeDAO.ajouterVehicule(vehicule)) {
@@ -224,16 +251,34 @@ public class Main {
         vehicule.Afficher();
         System.out.println();
         
-        System.out.println("\n" + ColorUtil.colorize("(Laissez vide pour conserver la valeur actuelle)", ColorUtil.YELLOW));
+        System.out.println("\n" + ColorUtil.info("Nouveau statut:"));
+        System.out.println(ColorUtil.colorize("1. ", ColorUtil.YELLOW) + "DISPONIBLE");
+        System.out.println(ColorUtil.colorize("2. ", ColorUtil.YELLOW) + "VENDU");
+        System.out.println(ColorUtil.colorize("0. ", ColorUtil.RED) + "Conserver le statut actuel");
+        System.out.print(ColorUtil.info("Votre choix: "));
         
-        System.out.print(ColorUtil.info("Nouveau statut (DISPONIBLE/EN_NEGOCIATION/VENDU): "));
-        String statut = scanner.nextLine();
-        if (!statut.isEmpty()) {
-            vehicule.setStatut(statut.toUpperCase());
+        int choix = lireChoix();
+        boolean modificationEffectuee = false;
+        
+        switch (choix) {
+            case 1:
+                vehicule.setStatut("DISPONIBLE");
+                modificationEffectuee = true;
+                break;
+            case 2:
+                vehicule.setStatut("VENDU");
+                modificationEffectuee = true;
+                break;
+            case 0:
+                System.out.println(ColorUtil.info("Statut conservé."));
+                return;
+            default:
+                System.out.println(ColorUtil.error("Choix invalide!"));
+                return;
         }
         
-        if (vehiculeDAO.modifierVehicule(vehicule)) {
-            System.out.println(ColorUtil.success("Véhicule modifié avec succès!"));
+        if (modificationEffectuee && vehiculeDAO.modifierVehicule(vehicule)) {
+            System.out.println(ColorUtil.success("Véhicule modifié avec succès! Nouveau statut: " + vehicule.getStatut()));
         } else {
             System.out.println(ColorUtil.error("Erreur lors de la modification!"));
         }
@@ -296,10 +341,27 @@ public class Main {
         System.out.println("\n" + ColorUtil.header("--- Ajout d'un client ---"));
         
         System.out.print(ColorUtil.info("Nom: "));
-        String nom = scanner.nextLine();
+        String nom = scanner.nextLine().trim();
+        
+        // Validation: nom non vide
+        if (nom.isEmpty()) {
+            System.out.println(ColorUtil.error("Erreur: Le nom ne peut pas être vide!"));
+            return;
+        }
         
         System.out.print(ColorUtil.info("Téléphone: "));
-        String telephone = scanner.nextLine();
+        String telephone = scanner.nextLine().trim();
+        
+        // Validation: téléphone non vide et contient au moins 8 caractères
+        if (telephone.isEmpty()) {
+            System.out.println(ColorUtil.error("Erreur: Le téléphone ne peut pas être vide!"));
+            return;
+        }
+        
+        if (telephone.length() < 8) {
+            System.out.println(ColorUtil.error("Erreur: Le téléphone doit contenir au moins 8 chiffres!"));
+            return;
+        }
         
         // Vérifier si le client existe déjà
         Client clientExistant = clientDAO.getClientByNomEtTelephone(nom, telephone);
@@ -398,10 +460,8 @@ public class Main {
         boolean continuer = true;
         while (continuer) {
             System.out.println("\n" + ColorUtil.header("--- RECHERCHE ET FILTRAGE ---"));
-            System.out.println(ColorUtil.colorize("1. ", ColorUtil.YELLOW) + "Recherche par marque");
-            System.out.println(ColorUtil.colorize("2. ", ColorUtil.YELLOW) + "Recherche par prix");
-            System.out.println(ColorUtil.colorize("3. ", ColorUtil.YELLOW) + "Recherche par catégorie");
-            System.out.println(ColorUtil.colorize("4. ", ColorUtil.YELLOW) + "Recherche avancée");
+            System.out.println(ColorUtil.colorize("1. ", ColorUtil.YELLOW) + "Recherche par prix");
+            System.out.println(ColorUtil.colorize("2. ", ColorUtil.YELLOW) + "Recherche par catégorie");
             System.out.println(ColorUtil.colorize("0. ", ColorUtil.RED) + "Retour au menu principal");
             System.out.print(ColorUtil.info("Votre choix: "));
             
@@ -409,16 +469,10 @@ public class Main {
             
             switch (choix) {
                 case 1:
-                    rechercherParMarque();
-                    break;
-                case 2:
                     rechercherParPrix();
                     break;
-                case 3:
+                case 2:
                     rechercherParCategorie();
-                    break;
-                case 4:
-                    rechercherAvancee();
                     break;
                 case 0:
                     continuer = false;
@@ -427,12 +481,6 @@ public class Main {
                     System.out.println(ColorUtil.error("Choix invalide!"));
             }
         }
-    }
-
-    private static void rechercherParMarque() {
-        System.out.print("\n" + ColorUtil.info("Marque à rechercher: "));
-        String marque = scanner.nextLine();
-        vehiculeDAO.rechercherEtAfficherVehicules(marque, null, null, null);
     }
 
     private static void rechercherParPrix() {
@@ -468,35 +516,6 @@ public class Main {
         }
         
         vehiculeDAO.rechercherEtAfficherVehicules(null, type, null, null);
-    }
-
-    private static void rechercherAvancee() {
-        System.out.println("\n" + ColorUtil.header("--- Recherche avancée ---"));
-        System.out.print(ColorUtil.info("Marque (laisser vide pour ignorer): "));
-        String marque = scanner.nextLine();
-        
-        System.out.print(ColorUtil.info("Type (BERLINE/SUV/CAMION/ELECTRIQUE, laisser vide pour ignorer): "));
-        String type = scanner.nextLine();
-        if (!type.isEmpty()) type = type.toUpperCase();
-        
-        System.out.print(ColorUtil.info("Prix maximum (0 pour ignorer): "));
-        double prixMax = lireDouble();
-        
-        System.out.print(ColorUtil.info("Année minimum (0 pour ignorer): "));
-        int anneeMin = 0;
-        try {
-            anneeMin = scanner.nextInt();
-        } catch (Exception e) {
-            anneeMin = 0;
-        }
-        scanner.nextLine();
-        
-        vehiculeDAO.rechercherEtAfficherVehicules(
-            marque.isEmpty() ? null : marque,
-            type.isEmpty() ? null : type,
-            prixMax == 0 ? null : prixMax,
-            anneeMin == 0 ? null : anneeMin
-        );
     }
 
     // ==================== MENU RAPPORTS ====================

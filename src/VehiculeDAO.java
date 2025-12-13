@@ -264,8 +264,6 @@ public class VehiculeDAO {
         switch (statut.toUpperCase()) {
             case "DISPONIBLE":
                 return ColorUtil.colorize(statut, ColorUtil.GREEN_BOLD);
-            case "EN_NEGOCIATION":
-                return ColorUtil.colorize(statut, ColorUtil.YELLOW_BOLD);
             case "VENDU":
                 return ColorUtil.colorize(statut, ColorUtil.RED_BOLD);
             default:

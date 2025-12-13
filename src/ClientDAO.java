@@ -108,26 +108,6 @@ public class ClientDAO {
     }
 
     /**
-     * Supprimer un client
-     */
-    public boolean supprimerClient(String id) {
-        String sql = "DELETE FROM clients WHERE id = ?";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, Integer.parseInt(id));
-            
-            int rows = stmt.executeUpdate();
-            return rows > 0;
-        } catch (SQLException e) {
-            System.err.println("Erreur lors de la suppression du client: " + e.getMessage());
-            return false;
-        } catch (NumberFormatException e) {
-            System.err.println("ID invalide: " + id);
-            return false;
-        }
-    }
-
-    /**
      * Rechercher et afficher des clients par nom ou téléphone
      */
     public void rechercherEtAfficherClients(String critere) {
