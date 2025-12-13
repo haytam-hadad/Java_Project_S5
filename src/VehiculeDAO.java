@@ -59,7 +59,7 @@ public class VehiculeDAO {
             }
             
             if (!hasData) {
-                System.out.println("Aucun véhicule trouvé.");
+                System.out.println(ColorUtil.warning("Aucun véhicule trouvé."));
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération des véhicules: " + e.getMessage());
@@ -82,7 +82,7 @@ public class VehiculeDAO {
             }
             
             if (!hasData) {
-                System.out.println("Aucun véhicule disponible.");
+                System.out.println(ColorUtil.warning("Aucun véhicule disponible."));
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération des véhicules disponibles: " + e.getMessage());
@@ -101,20 +101,23 @@ public class VehiculeDAO {
             boolean hasData = false;
             while (rs.next()) {
                 hasData = true;
-                System.out.println("═══════════════════════════════════════════════════");
-                System.out.println("ID: " + rs.getInt("id"));
-                System.out.println("Véhicule: " + rs.getString("marque") + " " + rs.getString("modele") + 
-                                 " (" + rs.getInt("annee") + ")");
-                System.out.println("Type: " + rs.getString("type_vehicule"));
-                System.out.println("Kilométrage: " + rs.getInt("kilometrage") + " km");
-                System.out.println("Prix de vente: " + rs.getDouble("prix_vente") + " DH");
-                System.out.println("Date de vente: " + (rs.getTimestamp("date_vende") != null ? 
-                                 rs.getTimestamp("date_vende").toString() : "N/A"));
-                System.out.println("═══════════════════════════════════════════════════");
+                System.out.println(ColorUtil.colorize("═══════════════════════════════════════════════════", ColorUtil.CYAN));
+                System.out.println(ColorUtil.colorize("ID: ", ColorUtil.CYAN) + ColorUtil.highlight(String.valueOf(rs.getInt("id"))));
+                System.out.println(ColorUtil.colorize("Véhicule: ", ColorUtil.CYAN) + 
+                                 ColorUtil.colorize(rs.getString("marque") + " " + rs.getString("modele"), ColorUtil.YELLOW) + 
+                                 ColorUtil.colorize(" (", ColorUtil.WHITE) + ColorUtil.highlight(String.valueOf(rs.getInt("annee"))) + 
+                                 ColorUtil.colorize(")", ColorUtil.WHITE));
+                System.out.println(ColorUtil.colorize("Type: ", ColorUtil.CYAN) + ColorUtil.colorize(rs.getString("type_vehicule"), ColorUtil.MAGENTA));
+                System.out.println(ColorUtil.colorize("Kilométrage: ", ColorUtil.CYAN) + ColorUtil.highlight(rs.getInt("kilometrage") + " km"));
+                System.out.println(ColorUtil.colorize("Prix de vente: ", ColorUtil.CYAN) + ColorUtil.colorize(String.format("%.2f", rs.getDouble("prix_vente")), ColorUtil.GREEN) + " DH");
+                System.out.println(ColorUtil.colorize("Date de vente: ", ColorUtil.CYAN) + 
+                                 (rs.getTimestamp("date_vende") != null ? 
+                                 ColorUtil.highlight(rs.getTimestamp("date_vende").toString()) : ColorUtil.colorize("N/A", ColorUtil.WHITE)));
+                System.out.println(ColorUtil.colorize("═══════════════════════════════════════════════════", ColorUtil.CYAN));
             }
             
             if (!hasData) {
-                System.out.println("Aucun véhicule vendu pour le moment.");
+                System.out.println(ColorUtil.warning("Aucun véhicule vendu pour le moment."));
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération des véhicules vendus: " + e.getMessage());
@@ -232,7 +235,7 @@ public class VehiculeDAO {
             }
             
             if (!hasData) {
-                System.out.println("Aucun véhicule trouvé avec ces critères.");
+                System.out.println(ColorUtil.warning("Aucun véhicule trouvé avec ces critères."));
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la recherche: " + e.getMessage());
@@ -243,14 +246,31 @@ public class VehiculeDAO {
      * Afficher un véhicule depuis un ResultSet
      */
     private void afficherVehicule(ResultSet rs) throws SQLException {
-        System.out.print("ID=" + rs.getInt("id") + " ||  " + 
-                        rs.getString("marque") + " " + rs.getString("modele") + 
-                        " (" + rs.getInt("annee") + ") ||  Km=" + rs.getInt("kilometrage") +
-                        " ||  Achat=" + rs.getDouble("prix_achat") + 
-                        " ||  Vente=" + rs.getDouble("prix_vente") +
-                        " ||  Type=" + rs.getString("type_vehicule") + 
-                        " ||  Statut=" + rs.getString("statut"));
+        String statut = rs.getString("statut");
+        String statutColor = getStatutColor(statut);
+        System.out.print(ColorUtil.colorize("ID=", ColorUtil.CYAN) + ColorUtil.highlight(String.valueOf(rs.getInt("id"))) + 
+                        ColorUtil.colorize(" ||  ", ColorUtil.WHITE) + 
+                        ColorUtil.colorize(rs.getString("marque") + " " + rs.getString("modele"), ColorUtil.YELLOW) + 
+                        ColorUtil.colorize(" (", ColorUtil.WHITE) + ColorUtil.highlight(String.valueOf(rs.getInt("annee"))) + 
+                        ColorUtil.colorize(") ||  Km=", ColorUtil.WHITE) + ColorUtil.highlight(String.valueOf(rs.getInt("kilometrage"))) +
+                        ColorUtil.colorize(" ||  Achat=", ColorUtil.WHITE) + ColorUtil.colorize(String.format("%.2f", rs.getDouble("prix_achat")), ColorUtil.GREEN) + 
+                        ColorUtil.colorize(" ||  Vente=", ColorUtil.WHITE) + ColorUtil.colorize(String.format("%.2f", rs.getDouble("prix_vente")), ColorUtil.GREEN) +
+                        ColorUtil.colorize(" ||  Type=", ColorUtil.WHITE) + ColorUtil.colorize(rs.getString("type_vehicule"), ColorUtil.MAGENTA) + 
+                        ColorUtil.colorize(" ||  Statut=", ColorUtil.WHITE) + statutColor);
         System.out.println();
+    }
+    
+    private String getStatutColor(String statut) {
+        switch (statut.toUpperCase()) {
+            case "DISPONIBLE":
+                return ColorUtil.colorize(statut, ColorUtil.GREEN_BOLD);
+            case "EN_NEGOCIATION":
+                return ColorUtil.colorize(statut, ColorUtil.YELLOW_BOLD);
+            case "VENDU":
+                return ColorUtil.colorize(statut, ColorUtil.RED_BOLD);
+            default:
+                return ColorUtil.colorize(statut, ColorUtil.WHITE);
+        }
     }
 
     /**

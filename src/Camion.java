@@ -13,8 +13,9 @@ public class Camion extends Vehicule {
     
     @Override
     public void Afficher() {
-        System.out.print("[CAMION] ");
+        System.out.print(ColorUtil.colorize("[CAMION]", ColorUtil.MAGENTA_BOLD) + " ");
         super.Afficher();
     }
 }
+
 

@@ -13,8 +13,9 @@ public class SUV extends Vehicule {
     
     @Override
     public void Afficher() {
-        System.out.print("[SUV] ");
+        System.out.print(ColorUtil.colorize("[SUV]", ColorUtil.MAGENTA_BOLD) + " ");
         super.Afficher();
     }
 }
+
 

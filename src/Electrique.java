@@ -13,8 +13,9 @@ public class Electrique extends Vehicule {
     
     @Override
     public void Afficher() {
-        System.out.print("[ELECTRIQUE] ");
+        System.out.print(ColorUtil.colorize("[ELECTRIQUE]", ColorUtil.MAGENTA_BOLD) + " ");
         super.Afficher();
     }
 }
+
 

@@ -45,10 +45,15 @@ public class Client {
     public void setDateCreation(Timestamp dateCreation) { this.dateCreation = dateCreation; }
 
     public void afficher() {
-        System.out.println("ID: " + id + " | Nom: " + nom + " | Téléphone: " + telephone + 
-                          " | Email: " + (email != null ? email : "N/A") + 
-                          " | Adresse: " + (adresse != null ? adresse : "N/A"));
+        System.out.println(ColorUtil.colorize("ID: ", ColorUtil.CYAN) + ColorUtil.highlight(id) + 
+                          ColorUtil.colorize(" | Nom: ", ColorUtil.WHITE) + ColorUtil.colorize(nom, ColorUtil.YELLOW) + 
+                          ColorUtil.colorize(" | Téléphone: ", ColorUtil.WHITE) + ColorUtil.highlight(telephone) + 
+                          ColorUtil.colorize(" | Email: ", ColorUtil.WHITE) + 
+                          ColorUtil.colorize((email != null ? email : "N/A"), email != null ? ColorUtil.CYAN : ColorUtil.WHITE) + 
+                          ColorUtil.colorize(" | Adresse: ", ColorUtil.WHITE) + 
+                          ColorUtil.colorize((adresse != null ? adresse : "N/A"), adresse != null ? ColorUtil.CYAN : ColorUtil.WHITE));
     }
 }
+
 
 

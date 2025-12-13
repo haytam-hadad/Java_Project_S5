@@ -54,7 +54,7 @@ public class ClientDAO {
             }
             
             if (!hasData) {
-                System.out.println("Aucun client trouvé.");
+                System.out.println(ColorUtil.warning("Aucun client trouvé."));
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération des clients: " + e.getMessage());
@@ -146,7 +146,7 @@ public class ClientDAO {
             }
             
             if (!hasData) {
-                System.out.println("Aucun client trouvé.");
+                System.out.println(ColorUtil.warning("Aucun client trouvé."));
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la recherche: " + e.getMessage());
@@ -157,13 +157,17 @@ public class ClientDAO {
      * Afficher un client depuis un ResultSet
      */
     private void afficherClient(ResultSet rs) throws SQLException {
-        System.out.println("═══════════════════════════════════════════════════");
-        System.out.println("ID: " + rs.getInt("id"));
-        System.out.println("Nom: " + rs.getString("nom"));
-        System.out.println("Téléphone: " + rs.getString("telephone"));
-        System.out.println("Email: " + (rs.getString("email") != null ? rs.getString("email") : "N/A"));
-        System.out.println("Adresse: " + (rs.getString("adresse") != null ? rs.getString("adresse") : "N/A"));
-        System.out.println("═══════════════════════════════════════════════════");
+        System.out.println(ColorUtil.colorize("═══════════════════════════════════════════════════", ColorUtil.CYAN));
+        System.out.println(ColorUtil.colorize("ID: ", ColorUtil.CYAN) + ColorUtil.highlight(String.valueOf(rs.getInt("id"))));
+        System.out.println(ColorUtil.colorize("Nom: ", ColorUtil.CYAN) + ColorUtil.colorize(rs.getString("nom"), ColorUtil.YELLOW));
+        System.out.println(ColorUtil.colorize("Téléphone: ", ColorUtil.CYAN) + ColorUtil.highlight(rs.getString("telephone")));
+        String email = rs.getString("email");
+        System.out.println(ColorUtil.colorize("Email: ", ColorUtil.CYAN) + 
+                          (email != null ? ColorUtil.colorize(email, ColorUtil.CYAN) : ColorUtil.colorize("N/A", ColorUtil.WHITE)));
+        String adresse = rs.getString("adresse");
+        System.out.println(ColorUtil.colorize("Adresse: ", ColorUtil.CYAN) + 
+                          (adresse != null ? ColorUtil.colorize(adresse, ColorUtil.CYAN) : ColorUtil.colorize("N/A", ColorUtil.WHITE)));
+        System.out.println(ColorUtil.colorize("═══════════════════════════════════════════════════", ColorUtil.CYAN));
     }
 
     /**

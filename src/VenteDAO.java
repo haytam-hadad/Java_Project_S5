@@ -24,19 +24,19 @@ public class VenteDAO {
             // Vérifier que le véhicule existe et est disponible
             Vehicule vehicule = vehiculeDAO.getVehiculeById(vehiculeId);
             if (vehicule == null) {
-                System.out.println("Véhicule introuvable!");
+                System.out.println(ColorUtil.error("Véhicule introuvable!"));
                 return false;
             }
             
             if (!"DISPONIBLE".equals(vehicule.getStatut()) && !"EN_NEGOCIATION".equals(vehicule.getStatut())) {
-                System.out.println("Ce véhicule n'est pas disponible à la vente!");
+                System.out.println(ColorUtil.error("Ce véhicule n'est pas disponible à la vente!"));
                 return false;
             }
             
             // Vérifier que le client existe
             Client client = clientDAO.getClientById(clientId);
             if (client == null) {
-                System.out.println("Client introuvable!");
+                System.out.println(ColorUtil.error("Client introuvable!"));
                 return false;
             }
             
@@ -45,11 +45,14 @@ public class VenteDAO {
             
             if (success) {
                 connection.commit();
-                System.out.println("\n✓ Vente enregistrée avec succès!");
-                System.out.println("Véhicule: " + vehicule.getMarque() + " " + vehicule.getModele());
-                System.out.println("Client: " + client.getNom());
-                System.out.println("Prix de vente: " + vehicule.getPrixVente() + " DH");
-                System.out.println("Prix final (avec taxes): " + String.format("%.2f", vehicule.calculerPrixFinal()) + " DH");
+                System.out.println("\n" + ColorUtil.success("Vente enregistrée avec succès!"));
+                System.out.println(ColorUtil.colorize("Véhicule: ", ColorUtil.CYAN) + 
+                                 ColorUtil.colorize(vehicule.getMarque() + " " + vehicule.getModele(), ColorUtil.YELLOW));
+                System.out.println(ColorUtil.colorize("Client: ", ColorUtil.CYAN) + ColorUtil.colorize(client.getNom(), ColorUtil.YELLOW));
+                System.out.println(ColorUtil.colorize("Prix de vente: ", ColorUtil.CYAN) + 
+                                 ColorUtil.colorize(String.format("%.2f", vehicule.getPrixVente()), ColorUtil.GREEN) + " DH");
+                System.out.println(ColorUtil.colorize("Prix final (avec taxes): ", ColorUtil.CYAN) + 
+                                 ColorUtil.highlight(String.format("%.2f", vehicule.calculerPrixFinal()) + " DH"));
                 return true;
             } else {
                 connection.rollback();
@@ -115,11 +118,12 @@ public class VenteDAO {
                 totalNegociation = rs.getInt("total");
             }
             
-            System.out.println("\n=== STATISTIQUES DE VENTES ===");
-            System.out.println("Véhicules vendus: " + totalVendus);
-            System.out.println("Véhicules disponibles: " + totalDisponibles);
-            System.out.println("Véhicules en négociation: " + totalNegociation);
-            System.out.println("Chiffre d'affaires total: " + String.format("%.2f", chiffreAffaires) + " DH");
+            System.out.println("\n" + ColorUtil.title("=== STATISTIQUES DE VENTES ==="));
+            System.out.println(ColorUtil.colorize("Véhicules vendus: ", ColorUtil.CYAN) + ColorUtil.highlight(String.valueOf(totalVendus)));
+            System.out.println(ColorUtil.colorize("Véhicules disponibles: ", ColorUtil.CYAN) + ColorUtil.highlight(String.valueOf(totalDisponibles)));
+            System.out.println(ColorUtil.colorize("Véhicules en négociation: ", ColorUtil.CYAN) + ColorUtil.highlight(String.valueOf(totalNegociation)));
+            System.out.println(ColorUtil.colorize("Chiffre d'affaires total: ", ColorUtil.CYAN) + 
+                             ColorUtil.colorize(String.format("%.2f", chiffreAffaires), ColorUtil.GREEN_BOLD) + " DH");
             
             stmt.close();
         } catch (SQLException e) {

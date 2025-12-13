@@ -13,7 +13,7 @@ public class Berline extends Vehicule {
     
     @Override
     public void Afficher() {
-        System.out.print("[BERLINE] ");
+        System.out.print(ColorUtil.colorize("[BERLINE]", ColorUtil.MAGENTA_BOLD) + " ");
         super.Afficher();
     }
 }

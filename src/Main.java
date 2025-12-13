@@ -8,13 +8,13 @@ public class Main {
     private static VenteDAO venteDAO = new VenteDAO();
 
     public static void main(String[] args) {
-        System.out.println("═══════════════════════════════════════════════════");
-        System.out.println("   SYSTÈME DE GESTION - CONCESSION VOITURES OCCASION");
-        System.out.println("═══════════════════════════════════════════════════\n");
+        System.out.println(ColorUtil.colorize("═══════════════════════════════════════════════════", ColorUtil.CYAN));
+        System.out.println(ColorUtil.title("   SYSTÈME DE GESTION - CONCESSION VOITURES OCCASION"));
+        System.out.println(ColorUtil.colorize("═══════════════════════════════════════════════════", ColorUtil.CYAN) + "\n");
         
         // Vérification du mot de passe pour accéder à l'application
         if (!verifierMotDePasse()) {
-            System.out.println("✗ Accès refusé. L'application se ferme.");
+            System.out.println(ColorUtil.error("Accès refusé. L'application se ferme."));
             return;
         }
         
@@ -22,12 +22,12 @@ public class Main {
         DatabaseConnection db = DatabaseConnection.getInstance();
         
         if (!db.isConnected()) {
-            System.out.println("✗ Échec de la connexion à la base de données!");
-            System.out.println("Veuillez vérifier votre configuration MySQL.");
+            System.out.println(ColorUtil.error("Échec de la connexion à la base de données!"));
+            System.out.println(ColorUtil.warning("Veuillez vérifier votre configuration MySQL."));
             return;
         }
         
-        System.out.println("✓ Connexion à la base de données établie avec succès!\n");
+        System.out.println(ColorUtil.success("Connexion à la base de données établie avec succès!") + "\n");
         
         // Menu principal
         boolean continuer = true;
@@ -50,11 +50,11 @@ public class Main {
                     break;
                 case 0:
                     continuer = false;
-                    System.out.println("\nMerci d'avoir utilisé le système de gestion!");
+                    System.out.println("\n" + ColorUtil.info("Merci d'avoir utilisé le système de gestion!"));
                     db.closeConnection();
                     break;
                 default:
-                    System.out.println("Choix invalide! Veuillez réessayer.");
+                    System.out.println(ColorUtil.error("Choix invalide! Veuillez réessayer."));
             }
         }
         
@@ -65,42 +65,42 @@ public class Main {
      * Vérifier le mot de passe pour accéder à l'application
      */
     private static boolean verifierMotDePasse() {
-        System.out.print("Mot de passe: ");
+        System.out.print(ColorUtil.info("Mot de passe: "));
         String motDePasse = scanner.nextLine();
         
         if ("111111".equals(motDePasse)) {
-            System.out.println("✓ Accès autorisé!\n");
+            System.out.println(ColorUtil.success("Accès autorisé!") + "\n");
             return true;
         } else {
-            System.out.println("✗ Mot de passe incorrect!");
+            System.out.println(ColorUtil.error("Mot de passe incorrect!"));
             return false;
         }
     }
 
     private static void afficherMenuPrincipal() {
-        System.out.println("\n═══════════════════════════════════════════════════");
-        System.out.println("              MENU PRINCIPAL");
-        System.out.println("═══════════════════════════════════════════════════");
-        System.out.println("1. Gestion des Véhicules");
-        System.out.println("2. Gestion des Clients");
-        System.out.println("3. Recherche et Filtrage");
-        System.out.println("4. Rapports");
-        System.out.println("0. Quitter");
-        System.out.println("═══════════════════════════════════════════════════");
-        System.out.print("Votre choix: ");
+        System.out.println("\n" + ColorUtil.colorize("═══════════════════════════════════════════════════", ColorUtil.CYAN));
+        System.out.println(ColorUtil.header("              MENU PRINCIPAL"));
+        System.out.println(ColorUtil.colorize("═══════════════════════════════════════════════════", ColorUtil.CYAN));
+        System.out.println(ColorUtil.colorize("1. ", ColorUtil.YELLOW) + "Gestion des Véhicules");
+        System.out.println(ColorUtil.colorize("2. ", ColorUtil.YELLOW) + "Gestion des Clients");
+        System.out.println(ColorUtil.colorize("3. ", ColorUtil.YELLOW) + "Recherche et Filtrage");
+        System.out.println(ColorUtil.colorize("4. ", ColorUtil.YELLOW) + "Rapports");
+        System.out.println(ColorUtil.colorize("0. ", ColorUtil.RED) + "Quitter");
+        System.out.println(ColorUtil.colorize("═══════════════════════════════════════════════════", ColorUtil.CYAN));
+        System.out.print(ColorUtil.info("Votre choix: "));
     }
 
     // ==================== MENU VÉHICULES ====================
     private static void menuVehicules() {
         boolean continuer = true;
         while (continuer) {
-            System.out.println("\n--- GESTION DES VÉHICULES ---");
-            System.out.println("1. Ajouter un véhicule");
-            System.out.println("2. Modifier un véhicule");
-            System.out.println("3. Supprimer un véhicule");
-            System.out.println("4. Afficher tous les véhicules");
-            System.out.println("0. Retour au menu principal");
-            System.out.print("Votre choix: ");
+            System.out.println("\n" + ColorUtil.header("--- GESTION DES VÉHICULES ---"));
+            System.out.println(ColorUtil.colorize("1. ", ColorUtil.YELLOW) + "Ajouter un véhicule");
+            System.out.println(ColorUtil.colorize("2. ", ColorUtil.YELLOW) + "Modifier un véhicule");
+            System.out.println(ColorUtil.colorize("3. ", ColorUtil.YELLOW) + "Supprimer un véhicule");
+            System.out.println(ColorUtil.colorize("4. ", ColorUtil.YELLOW) + "Afficher tous les véhicules");
+            System.out.println(ColorUtil.colorize("0. ", ColorUtil.RED) + "Retour au menu principal");
+            System.out.print(ColorUtil.info("Votre choix: "));
             
             int choix = lireChoix();
             
@@ -121,59 +121,59 @@ public class Main {
                     continuer = false;
                     break;
                 default:
-                    System.out.println("Choix invalide!");
+                    System.out.println(ColorUtil.error("Choix invalide!"));
             }
         }
     }
 
     private static void ajouterVehicule() {
-        System.out.println("\n--- Ajout d'un véhicule ---");
+        System.out.println("\n" + ColorUtil.header("--- Ajout d'un véhicule ---"));
         
-        System.out.print("Marque: ");
+        System.out.print(ColorUtil.info("Marque: "));
         String marque = scanner.nextLine();
         
-        System.out.print("Modèle: ");
+        System.out.print(ColorUtil.info("Modèle: "));
         String modele = scanner.nextLine();
         
-        System.out.print("Prix d'achat (DH): ");
+        System.out.print(ColorUtil.info("Prix d'achat (DH): "));
         double prixAchat = lireDouble();
         
-        System.out.print("Prix de vente (DH): ");
+        System.out.print(ColorUtil.info("Prix de vente (DH): "));
         double prixVente = lireDouble();
         
         // Validation: prix de vente > prix d'achat
         if (prixVente <= prixAchat) {
-            System.out.println("✗ Erreur: Le prix de vente doit être supérieur au prix d'achat!");
+            System.out.println(ColorUtil.error("Erreur: Le prix de vente doit être supérieur au prix d'achat!"));
             return;
         }
         
-        System.out.print("Année: ");
+        System.out.print(ColorUtil.info("Année: "));
         int annee = scanner.nextInt();
         scanner.nextLine();
         
         // Validation: année entre 1900 et année actuelle
         int anneeActuelle = Calendar.getInstance().get(Calendar.YEAR);
         if (annee < 1900 || annee > anneeActuelle) {
-            System.out.println("✗ Erreur: Année invalide! Doit être entre 1900 et " + anneeActuelle);
+            System.out.println(ColorUtil.error("Erreur: Année invalide! Doit être entre 1900 et " + anneeActuelle));
             return;
         }
         
-        System.out.print("Kilométrage: ");
+        System.out.print(ColorUtil.info("Kilométrage: "));
         int kilometrage = scanner.nextInt();
         scanner.nextLine();
         
         // Validation: kilométrage positif
         if (kilometrage < 0) {
-            System.out.println("✗ Erreur: Le kilométrage doit être positif!");
+            System.out.println(ColorUtil.error("Erreur: Le kilométrage doit être positif!"));
             return;
         }
         
-        System.out.println("\nType de véhicule:");
-        System.out.println("1. BERLINE");
-        System.out.println("2. SUV");
-        System.out.println("3. CAMION");
-        System.out.println("4. ELECTRIQUE");
-        System.out.print("Votre choix: ");
+        System.out.println("\n" + ColorUtil.info("Type de véhicule:"));
+        System.out.println(ColorUtil.colorize("1. ", ColorUtil.YELLOW) + "BERLINE");
+        System.out.println(ColorUtil.colorize("2. ", ColorUtil.YELLOW) + "SUV");
+        System.out.println(ColorUtil.colorize("3. ", ColorUtil.YELLOW) + "CAMION");
+        System.out.println(ColorUtil.colorize("4. ", ColorUtil.YELLOW) + "ELECTRIQUE");
+        System.out.print(ColorUtil.info("Votre choix: "));
         int typeChoix = lireChoix();
         
         Vehicule vehicule = null;
@@ -196,62 +196,62 @@ public class Main {
                                          kilometrage, "DISPONIBLE", null, null);
                 break;
             default:
-                System.out.println("Type invalide!");
+                System.out.println(ColorUtil.error("Type invalide!"));
                 return;
         }
         
         if (vehiculeDAO.ajouterVehicule(vehicule)) {
-            System.out.println("✓ Véhicule ajouté avec succès! ID: " + vehicule.getId());
-            System.out.println("Prix final (avec taxes): " + 
-                             String.format("%.2f", vehicule.calculerPrixFinal()) + " DH");
+            System.out.println(ColorUtil.success("Véhicule ajouté avec succès! ID: " + ColorUtil.highlight(vehicule.getId())));
+            System.out.println(ColorUtil.info("Prix final (avec taxes): ") + 
+                             ColorUtil.highlight(String.format("%.2f", vehicule.calculerPrixFinal()) + " DH"));
         } else {
-            System.out.println("✗ Erreur lors de l'ajout du véhicule!");
+            System.out.println(ColorUtil.error("Erreur lors de l'ajout du véhicule!"));
         }
     }
 
     private static void modifierVehicule() {
-        System.out.println("\n--- Modification d'un véhicule ---");
-        System.out.print("ID du véhicule: ");
+        System.out.println("\n" + ColorUtil.header("--- Modification d'un véhicule ---"));
+        System.out.print(ColorUtil.info("ID du véhicule: "));
         String id = scanner.nextLine();
         
         Vehicule vehicule = vehiculeDAO.getVehiculeById(id);
         if (vehicule == null) {
-            System.out.println("Véhicule introuvable!");
+            System.out.println(ColorUtil.error("Véhicule introuvable!"));
             return;
         }
         
-        System.out.println("Véhicule actuel:");
+        System.out.println(ColorUtil.info("Véhicule actuel:"));
         vehicule.Afficher();
         System.out.println();
         
-        System.out.println("\n(Laissez vide pour conserver la valeur actuelle)");
+        System.out.println("\n" + ColorUtil.colorize("(Laissez vide pour conserver la valeur actuelle)", ColorUtil.YELLOW));
         
-        System.out.print("Nouveau statut (DISPONIBLE/EN_NEGOCIATION/VENDU): ");
+        System.out.print(ColorUtil.info("Nouveau statut (DISPONIBLE/EN_NEGOCIATION/VENDU): "));
         String statut = scanner.nextLine();
         if (!statut.isEmpty()) {
             vehicule.setStatut(statut.toUpperCase());
         }
         
         if (vehiculeDAO.modifierVehicule(vehicule)) {
-            System.out.println("✓ Véhicule modifié avec succès!");
+            System.out.println(ColorUtil.success("Véhicule modifié avec succès!"));
         } else {
-            System.out.println("✗ Erreur lors de la modification!");
+            System.out.println(ColorUtil.error("Erreur lors de la modification!"));
         }
     }
 
     private static void supprimerVehicule() {
-        System.out.println("\n--- Suppression d'un véhicule ---");
-        System.out.print("ID du véhicule: ");
+        System.out.println("\n" + ColorUtil.header("--- Suppression d'un véhicule ---"));
+        System.out.print(ColorUtil.info("ID du véhicule: "));
         String id = scanner.nextLine();
         
-        System.out.print("Êtes-vous sûr? (o/n): ");
+        System.out.print(ColorUtil.warning("Êtes-vous sûr? (o/n): "));
         String confirmation = scanner.nextLine();
         
         if (confirmation.equalsIgnoreCase("o")) {
             if (vehiculeDAO.supprimerVehicule(id)) {
-                System.out.println("✓ Véhicule supprimé avec succès!");
+                System.out.println(ColorUtil.success("Véhicule supprimé avec succès!"));
             } else {
-                System.out.println("✗ Erreur lors de la suppression!");
+                System.out.println(ColorUtil.error("Erreur lors de la suppression!"));
             }
         }
     }
@@ -260,13 +260,13 @@ public class Main {
     private static void menuClients() {
         boolean continuer = true;
         while (continuer) {
-            System.out.println("\n--- GESTION DES CLIENTS ---");
-            System.out.println("1. Ajouter un client");
-            System.out.println("2. Modifier un client");
-            System.out.println("3. Rechercher un client");
-            System.out.println("4. Afficher tous les clients");
-            System.out.println("0. Retour au menu principal");
-            System.out.print("Votre choix: ");
+            System.out.println("\n" + ColorUtil.header("--- GESTION DES CLIENTS ---"));
+            System.out.println(ColorUtil.colorize("1. ", ColorUtil.YELLOW) + "Ajouter un client");
+            System.out.println(ColorUtil.colorize("2. ", ColorUtil.YELLOW) + "Modifier un client");
+            System.out.println(ColorUtil.colorize("3. ", ColorUtil.YELLOW) + "Rechercher un client");
+            System.out.println(ColorUtil.colorize("4. ", ColorUtil.YELLOW) + "Afficher tous les clients");
+            System.out.println(ColorUtil.colorize("0. ", ColorUtil.RED) + "Retour au menu principal");
+            System.out.print(ColorUtil.info("Votre choix: "));
             
             int choix = lireChoix();
             
@@ -287,107 +287,107 @@ public class Main {
                     continuer = false;
                     break;
                 default:
-                    System.out.println("Choix invalide!");
+                    System.out.println(ColorUtil.error("Choix invalide!"));
             }
         }
     }
 
     private static void ajouterClient() {
-        System.out.println("\n--- Ajout d'un client ---");
+        System.out.println("\n" + ColorUtil.header("--- Ajout d'un client ---"));
         
-        System.out.print("Nom: ");
+        System.out.print(ColorUtil.info("Nom: "));
         String nom = scanner.nextLine();
         
-        System.out.print("Téléphone: ");
+        System.out.print(ColorUtil.info("Téléphone: "));
         String telephone = scanner.nextLine();
         
         // Vérifier si le client existe déjà
         Client clientExistant = clientDAO.getClientByNomEtTelephone(nom, telephone);
         if (clientExistant != null) {
-            System.out.println("\n⚠ Ce client existe déjà dans la base de données:");
+            System.out.println("\n" + ColorUtil.warning("Ce client existe déjà dans la base de données:"));
             clientExistant.afficher();
-            System.out.print("\nVoulez-vous continuer quand même? (o/n): ");
+            System.out.print("\n" + ColorUtil.warning("Voulez-vous continuer quand même? (o/n): "));
             String reponse = scanner.nextLine();
             if (!reponse.equalsIgnoreCase("o")) {
-                System.out.println("Ajout annulé.");
+                System.out.println(ColorUtil.info("Ajout annulé."));
                 return;
             }
         } else {
             // Vérifier aussi par téléphone seul
             clientExistant = clientDAO.getClientByTelephone(telephone);
             if (clientExistant != null) {
-                System.out.println("\n⚠ Un client avec ce numéro de téléphone existe déjà:");
+                System.out.println("\n" + ColorUtil.warning("Un client avec ce numéro de téléphone existe déjà:"));
                 clientExistant.afficher();
-                System.out.print("\nVoulez-vous continuer quand même? (o/n): ");
+                System.out.print("\n" + ColorUtil.warning("Voulez-vous continuer quand même? (o/n): "));
                 String reponse = scanner.nextLine();
                 if (!reponse.equalsIgnoreCase("o")) {
-                    System.out.println("Ajout annulé.");
+                    System.out.println(ColorUtil.info("Ajout annulé."));
                     return;
                 }
             }
         }
         
-        System.out.print("Email (optionnel): ");
+        System.out.print(ColorUtil.info("Email (optionnel): "));
         String email = scanner.nextLine();
         if (email.isEmpty()) email = null;
         
-        System.out.print("Adresse (optionnel): ");
+        System.out.print(ColorUtil.info("Adresse (optionnel): "));
         String adresse = scanner.nextLine();
         if (adresse.isEmpty()) adresse = null;
         
         Client client = new Client(null, nom, telephone, email, adresse);
         
         if (clientDAO.ajouterClient(client)) {
-            System.out.println("\n✓ Client ajouté avec succès! ID: " + client.getId());
-            System.out.println("\nInformations du client:");
+            System.out.println("\n" + ColorUtil.success("Client ajouté avec succès! ID: " + ColorUtil.highlight(client.getId())));
+            System.out.println("\n" + ColorUtil.info("Informations du client:"));
             client.afficher();
         } else {
-            System.out.println("✗ Erreur lors de l'ajout du client!");
+            System.out.println(ColorUtil.error("Erreur lors de l'ajout du client!"));
         }
     }
 
     private static void modifierClient() {
-        System.out.println("\n--- Modification d'un client ---");
-        System.out.print("ID du client: ");
+        System.out.println("\n" + ColorUtil.header("--- Modification d'un client ---"));
+        System.out.print(ColorUtil.info("ID du client: "));
         String id = scanner.nextLine();
         
         Client client = clientDAO.getClientById(id);
         if (client == null) {
-            System.out.println("Client introuvable!");
+            System.out.println(ColorUtil.error("Client introuvable!"));
             return;
         }
         
-        System.out.println("Client actuel:");
+        System.out.println(ColorUtil.info("Client actuel:"));
         client.afficher();
         
-        System.out.println("\n(Laissez vide pour conserver la valeur actuelle)");
+        System.out.println("\n" + ColorUtil.colorize("(Laissez vide pour conserver la valeur actuelle)", ColorUtil.YELLOW));
         
-        System.out.print("Nouveau nom: ");
+        System.out.print(ColorUtil.info("Nouveau nom: "));
         String nom = scanner.nextLine();
         if (!nom.isEmpty()) client.setNom(nom);
         
-        System.out.print("Nouveau téléphone: ");
+        System.out.print(ColorUtil.info("Nouveau téléphone: "));
         String telephone = scanner.nextLine();
         if (!telephone.isEmpty()) client.setTelephone(telephone);
         
-        System.out.print("Nouvel email: ");
+        System.out.print(ColorUtil.info("Nouvel email: "));
         String email = scanner.nextLine();
         if (!email.isEmpty()) client.setEmail(email);
         
-        System.out.print("Nouvelle adresse: ");
+        System.out.print(ColorUtil.info("Nouvelle adresse: "));
         String adresse = scanner.nextLine();
         if (!adresse.isEmpty()) client.setAdresse(adresse);
         
         if (clientDAO.modifierClient(client)) {
-            System.out.println("✓ Client modifié avec succès!");
+            System.out.println(ColorUtil.success("Client modifié avec succès!"));
         } else {
-            System.out.println("✗ Erreur lors de la modification!");
+            System.out.println(ColorUtil.error("Erreur lors de la modification!"));
         }
     }
 
     private static void rechercherClient() {
-        System.out.println("\n--- Recherche d'un client ---");
-        System.out.print("Nom ou téléphone: ");
+        System.out.println("\n" + ColorUtil.header("--- Recherche d'un client ---"));
+        System.out.print(ColorUtil.info("Nom ou téléphone: "));
         String critere = scanner.nextLine();
         
         clientDAO.rechercherEtAfficherClients(critere);
@@ -397,13 +397,13 @@ public class Main {
     private static void menuRecherche() {
         boolean continuer = true;
         while (continuer) {
-            System.out.println("\n--- RECHERCHE ET FILTRAGE ---");
-            System.out.println("1. Recherche par marque");
-            System.out.println("2. Recherche par prix");
-            System.out.println("3. Recherche par catégorie");
-            System.out.println("4. Recherche avancée");
-            System.out.println("0. Retour au menu principal");
-            System.out.print("Votre choix: ");
+            System.out.println("\n" + ColorUtil.header("--- RECHERCHE ET FILTRAGE ---"));
+            System.out.println(ColorUtil.colorize("1. ", ColorUtil.YELLOW) + "Recherche par marque");
+            System.out.println(ColorUtil.colorize("2. ", ColorUtil.YELLOW) + "Recherche par prix");
+            System.out.println(ColorUtil.colorize("3. ", ColorUtil.YELLOW) + "Recherche par catégorie");
+            System.out.println(ColorUtil.colorize("4. ", ColorUtil.YELLOW) + "Recherche avancée");
+            System.out.println(ColorUtil.colorize("0. ", ColorUtil.RED) + "Retour au menu principal");
+            System.out.print(ColorUtil.info("Votre choix: "));
             
             int choix = lireChoix();
             
@@ -424,35 +424,35 @@ public class Main {
                     continuer = false;
                     break;
                 default:
-                    System.out.println("Choix invalide!");
+                    System.out.println(ColorUtil.error("Choix invalide!"));
             }
         }
     }
 
     private static void rechercherParMarque() {
-        System.out.print("\nMarque à rechercher: ");
+        System.out.print("\n" + ColorUtil.info("Marque à rechercher: "));
         String marque = scanner.nextLine();
         vehiculeDAO.rechercherEtAfficherVehicules(marque, null, null, null);
     }
 
     private static void rechercherParPrix() {
-        System.out.print("\nPrix maximum (DH): ");
+        System.out.print("\n" + ColorUtil.info("Prix maximum (DH): "));
         double prixMax = lireDouble();
         
         if (prixMax > 0) {
             vehiculeDAO.rechercherEtAfficherVehicules(null, null, prixMax, null);
         } else {
-            System.out.println("Prix invalide!");
+            System.out.println(ColorUtil.error("Prix invalide!"));
         }
     }
 
     private static void rechercherParCategorie() {
-        System.out.println("\nCatégories disponibles:");
-        System.out.println("1. BERLINE");
-        System.out.println("2. SUV");
-        System.out.println("3. CAMION");
-        System.out.println("4. ELECTRIQUE");
-        System.out.print("Votre choix: ");
+        System.out.println("\n" + ColorUtil.info("Catégories disponibles:"));
+        System.out.println(ColorUtil.colorize("1. ", ColorUtil.YELLOW) + "BERLINE");
+        System.out.println(ColorUtil.colorize("2. ", ColorUtil.YELLOW) + "SUV");
+        System.out.println(ColorUtil.colorize("3. ", ColorUtil.YELLOW) + "CAMION");
+        System.out.println(ColorUtil.colorize("4. ", ColorUtil.YELLOW) + "ELECTRIQUE");
+        System.out.print(ColorUtil.info("Votre choix: "));
         
         int choix = lireChoix();
         String type = "";
@@ -463,7 +463,7 @@ public class Main {
             case 3: type = "CAMION"; break;
             case 4: type = "ELECTRIQUE"; break;
             default:
-                System.out.println("Choix invalide!");
+                System.out.println(ColorUtil.error("Choix invalide!"));
                 return;
         }
         
@@ -471,18 +471,18 @@ public class Main {
     }
 
     private static void rechercherAvancee() {
-        System.out.println("\n--- Recherche avancée ---");
-        System.out.print("Marque (laisser vide pour ignorer): ");
+        System.out.println("\n" + ColorUtil.header("--- Recherche avancée ---"));
+        System.out.print(ColorUtil.info("Marque (laisser vide pour ignorer): "));
         String marque = scanner.nextLine();
         
-        System.out.print("Type (BERLINE/SUV/CAMION/ELECTRIQUE, laisser vide pour ignorer): ");
+        System.out.print(ColorUtil.info("Type (BERLINE/SUV/CAMION/ELECTRIQUE, laisser vide pour ignorer): "));
         String type = scanner.nextLine();
         if (!type.isEmpty()) type = type.toUpperCase();
         
-        System.out.print("Prix maximum (0 pour ignorer): ");
+        System.out.print(ColorUtil.info("Prix maximum (0 pour ignorer): "));
         double prixMax = lireDouble();
         
-        System.out.print("Année minimum (0 pour ignorer): ");
+        System.out.print(ColorUtil.info("Année minimum (0 pour ignorer): "));
         int anneeMin = 0;
         try {
             anneeMin = scanner.nextInt();
@@ -503,12 +503,12 @@ public class Main {
     private static void menuRapports() {
         boolean continuer = true;
         while (continuer) {
-            System.out.println("\n--- RAPPORTS ---");
-            System.out.println("1. Véhicules disponibles");
-            System.out.println("2. Véhicules vendus");
-            System.out.println("3. Statistiques de ventes");
-            System.out.println("0. Retour au menu principal");
-            System.out.print("Votre choix: ");
+            System.out.println("\n" + ColorUtil.header("--- RAPPORTS ---"));
+            System.out.println(ColorUtil.colorize("1. ", ColorUtil.YELLOW) + "Véhicules disponibles");
+            System.out.println(ColorUtil.colorize("2. ", ColorUtil.YELLOW) + "Véhicules vendus");
+            System.out.println(ColorUtil.colorize("3. ", ColorUtil.YELLOW) + "Statistiques de ventes");
+            System.out.println(ColorUtil.colorize("0. ", ColorUtil.RED) + "Retour au menu principal");
+            System.out.print(ColorUtil.info("Votre choix: "));
             
             int choix = lireChoix();
             
@@ -526,13 +526,13 @@ public class Main {
                     continuer = false;
                     break;
                 default:
-                    System.out.println("Choix invalide!");
+                    System.out.println(ColorUtil.error("Choix invalide!"));
             }
         }
     }
 
     private static void afficherVehiculesVendus() {
-        System.out.println("\n=== VÉHICULES VENDUS ===");
+        System.out.println("\n" + ColorUtil.title("=== VÉHICULES VENDUS ==="));
         vehiculeDAO.afficherVehiculesVendus();
     }
 

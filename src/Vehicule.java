@@ -58,8 +58,28 @@ public class Vehicule {
     }
 
     public void Afficher() {
-        System.out.print("ID=" + id + " ||  " + marque + " " + modele + " (" + annee + ") ||  Km=" + kilometrage +
-                " ||  Achat=" + prixAchat + " ||  Vente=" + prixVente +
-                " ||  Type=" + typeVehicule + " ||  Statut=" + statut);
+        String statutColor = getStatutColor(statut);
+        System.out.print(ColorUtil.colorize("ID=", ColorUtil.CYAN) + ColorUtil.highlight(id) + 
+                ColorUtil.colorize(" ||  ", ColorUtil.WHITE) + 
+                ColorUtil.colorize(marque + " " + modele, ColorUtil.YELLOW) + 
+                ColorUtil.colorize(" (", ColorUtil.WHITE) + ColorUtil.highlight(String.valueOf(annee)) + 
+                ColorUtil.colorize(") ||  Km=", ColorUtil.WHITE) + ColorUtil.highlight(String.valueOf(kilometrage)) +
+                ColorUtil.colorize(" ||  Achat=", ColorUtil.WHITE) + ColorUtil.colorize(String.format("%.2f", prixAchat), ColorUtil.GREEN) + 
+                ColorUtil.colorize(" ||  Vente=", ColorUtil.WHITE) + ColorUtil.colorize(String.format("%.2f", prixVente), ColorUtil.GREEN) +
+                ColorUtil.colorize(" ||  Type=", ColorUtil.WHITE) + ColorUtil.colorize(typeVehicule, ColorUtil.MAGENTA) + 
+                ColorUtil.colorize(" ||  Statut=", ColorUtil.WHITE) + statutColor);
+    }
+    
+    private String getStatutColor(String statut) {
+        switch (statut.toUpperCase()) {
+            case "DISPONIBLE":
+                return ColorUtil.colorize(statut, ColorUtil.GREEN_BOLD);
+            case "EN_NEGOCIATION":
+                return ColorUtil.colorize(statut, ColorUtil.YELLOW_BOLD);
+            case "VENDU":
+                return ColorUtil.colorize(statut, ColorUtil.RED_BOLD);
+            default:
+                return ColorUtil.colorize(statut, ColorUtil.WHITE);
+        }
     }
 }
