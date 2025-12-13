@@ -49,6 +49,10 @@ public class Vehicule {
     public String getDateAjout() { return dateAjout; }
     public String getDateVente() { return dateVente; }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public void setStatut(String statut) {
         this.statut = statut;
     }

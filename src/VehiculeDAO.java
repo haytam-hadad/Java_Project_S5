@@ -14,22 +14,29 @@ public class VehiculeDAO {
      * Ajouter un véhicule à la base de données
      */
     public boolean ajouterVehicule(Vehicule vehicule) {
-        String sql = "INSERT INTO vehicules (id, marque, modele, prix_achat, prix_vente, annee, " +
-                     "kilometrage, type_vehicule, statut, date_ajout) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO vehicules (marque, modele, prix_achat, prix_vente, annee, " +
+                     "kilometrage, type_vehicule, statut, date_ajout) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
         
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, vehicule.getId());
-            stmt.setString(2, vehicule.getMarque());
-            stmt.setString(3, vehicule.getModele());
-            stmt.setDouble(4, vehicule.getPrixAchat());
-            stmt.setDouble(5, vehicule.getPrixVente());
-            stmt.setInt(6, vehicule.getAnnee());
-            stmt.setInt(7, vehicule.getKilometrage());
-            stmt.setString(8, vehicule.getTypeVehicule());
-            stmt.setString(9, vehicule.getStatut());
+        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, vehicule.getMarque());
+            stmt.setString(2, vehicule.getModele());
+            stmt.setDouble(3, vehicule.getPrixAchat());
+            stmt.setDouble(4, vehicule.getPrixVente());
+            stmt.setInt(5, vehicule.getAnnee());
+            stmt.setInt(6, vehicule.getKilometrage());
+            stmt.setString(7, vehicule.getTypeVehicule());
+            stmt.setString(8, vehicule.getStatut());
             
             int rows = stmt.executeUpdate();
-            return rows > 0;
+            if (rows > 0) {
+                ResultSet generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int generatedId = generatedKeys.getInt(1);
+                    vehicule.setId(String.valueOf(generatedId));
+                }
+                return true;
+            }
+            return false;
         } catch (SQLException e) {
             System.err.println("Erreur lors de l'ajout du véhicule: " + e.getMessage());
             return false;
@@ -83,13 +90,45 @@ public class VehiculeDAO {
     }
 
     /**
+     * Afficher les véhicules vendus
+     */
+    public void afficherVehiculesVendus() {
+        String sql = "SELECT * FROM vehicules WHERE statut = 'VENDU' ORDER BY date_vende DESC";
+        
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            boolean hasData = false;
+            while (rs.next()) {
+                hasData = true;
+                System.out.println("═══════════════════════════════════════════════════");
+                System.out.println("ID: " + rs.getInt("id"));
+                System.out.println("Véhicule: " + rs.getString("marque") + " " + rs.getString("modele") + 
+                                 " (" + rs.getInt("annee") + ")");
+                System.out.println("Type: " + rs.getString("type_vehicule"));
+                System.out.println("Kilométrage: " + rs.getInt("kilometrage") + " km");
+                System.out.println("Prix de vente: " + rs.getDouble("prix_vente") + " DH");
+                System.out.println("Date de vente: " + (rs.getTimestamp("date_vende") != null ? 
+                                 rs.getTimestamp("date_vende").toString() : "N/A"));
+                System.out.println("═══════════════════════════════════════════════════");
+            }
+            
+            if (!hasData) {
+                System.out.println("Aucun véhicule vendu pour le moment.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la récupération des véhicules vendus: " + e.getMessage());
+        }
+    }
+
+    /**
      * Récupérer un véhicule par son ID
      */
     public Vehicule getVehiculeById(String id) {
         String sql = "SELECT * FROM vehicules WHERE id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, id);
+            stmt.setInt(1, Integer.parseInt(id));
             ResultSet rs = stmt.executeQuery();
             
             if (rs.next()) {
@@ -97,27 +136,11 @@ public class VehiculeDAO {
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération du véhicule: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.err.println("ID invalide: " + id);
         }
         
         return null;
-    }
-
-    /**
-     * Mettre à jour le statut d'un véhicule
-     */
-    public boolean updateStatut(String id, String nouveauStatut) {
-        String sql = "UPDATE vehicules SET statut = ? WHERE id = ?";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, nouveauStatut);
-            stmt.setString(2, id);
-            
-            int rows = stmt.executeUpdate();
-            return rows > 0;
-        } catch (SQLException e) {
-            System.err.println("Erreur lors de la mise à jour du statut: " + e.getMessage());
-            return false;
-        }
     }
 
     /**
@@ -127,12 +150,15 @@ public class VehiculeDAO {
         String sql = "UPDATE vehicules SET statut = 'VENDU', date_vende = NOW() WHERE id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, id);
+            stmt.setInt(1, Integer.parseInt(id));
             
             int rows = stmt.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
             System.err.println("Erreur lors de la vente du véhicule: " + e.getMessage());
+            return false;
+        } catch (NumberFormatException e) {
+            System.err.println("ID invalide: " + id);
             return false;
         }
     }
@@ -144,12 +170,15 @@ public class VehiculeDAO {
         String sql = "DELETE FROM vehicules WHERE id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, id);
+            stmt.setInt(1, Integer.parseInt(id));
             
             int rows = stmt.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
             System.err.println("Erreur lors de la suppression du véhicule: " + e.getMessage());
+            return false;
+        } catch (NumberFormatException e) {
+            System.err.println("ID invalide: " + id);
             return false;
         }
     }
@@ -214,7 +243,7 @@ public class VehiculeDAO {
      * Afficher un véhicule depuis un ResultSet
      */
     private void afficherVehicule(ResultSet rs) throws SQLException {
-        System.out.print("ID=" + rs.getString("id") + " ||  " + 
+        System.out.print("ID=" + rs.getInt("id") + " ||  " + 
                         rs.getString("marque") + " " + rs.getString("modele") + 
                         " (" + rs.getInt("annee") + ") ||  Km=" + rs.getInt("kilometrage") +
                         " ||  Achat=" + rs.getDouble("prix_achat") + 
@@ -228,7 +257,7 @@ public class VehiculeDAO {
      * Mapper un ResultSet vers un objet Vehicule
      */
     private Vehicule mapResultSetToVehicule(ResultSet rs) throws SQLException {
-        String id = rs.getString("id");
+        String id = String.valueOf(rs.getInt("id"));
         String marque = rs.getString("marque");
         String modele = rs.getString("modele");
         double prixAchat = rs.getDouble("prix_achat");
@@ -245,5 +274,25 @@ public class VehiculeDAO {
         
         return new Vehicule(id, marque, modele, prixAchat, prixVente, annee, kilometrage, 
                            typeVehicule, statut, dateAjoutStr, dateVenteStr);
+    }
+
+    /**
+     * Modifier un véhicule
+     */
+    public boolean modifierVehicule(Vehicule vehicule) {
+        String sql = "UPDATE vehicules SET statut = ? WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, vehicule.getStatut());
+            stmt.setInt(2, Integer.parseInt(vehicule.getId()));
+            
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la modification du véhicule: " + e.getMessage());
+            return false;
+        } catch (NumberFormatException e) {
+            System.err.println("ID invalide: " + vehicule.getId());
+            return false;
+        }
     }
 }

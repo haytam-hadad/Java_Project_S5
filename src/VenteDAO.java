@@ -127,33 +127,4 @@ public class VenteDAO {
         }
     }
 
-    /**
-     * Afficher les véhicules achetés par un client
-     */
-    public void afficherAchatsClient(String clientId) {
-        String sql = "SELECT * FROM vehicules WHERE statut = 'VENDU' AND date_vende IS NOT NULL " +
-                     "ORDER BY date_vende DESC";
-        
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            
-            boolean hasData = false;
-            System.out.println("\n=== VÉHICULES VENDUS ===");
-            while (rs.next()) {
-                hasData = true;
-                System.out.println("----------------------------------------");
-                System.out.println("Véhicule: " + rs.getString("marque") + " " + rs.getString("modele") + 
-                                 " (" + rs.getInt("annee") + ")");
-                System.out.println("Type: " + rs.getString("type_vehicule"));
-                System.out.println("Prix de vente: " + rs.getDouble("prix_vente") + " DH");
-                System.out.println("Date de vente: " + rs.getTimestamp("date_vende"));
-            }
-            
-            if (!hasData) {
-                System.out.println("Aucun véhicule vendu pour le moment.");
-            }
-        } catch (SQLException e) {
-            System.err.println("Erreur lors de la récupération des achats: " + e.getMessage());
-        }
-    }
 }

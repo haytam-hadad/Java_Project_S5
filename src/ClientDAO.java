@@ -14,17 +14,24 @@ public class ClientDAO {
      * Ajouter un client
      */
     public boolean ajouterClient(Client client) {
-        String sql = "INSERT INTO clients (id, nom, telephone, email, adresse, date_creation) VALUES (?, ?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO clients (nom, telephone, email, adresse, date_creation) VALUES (?, ?, ?, ?, NOW())";
         
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, client.getId());
-            stmt.setString(2, client.getNom());
-            stmt.setString(3, client.getTelephone());
-            stmt.setString(4, client.getEmail());
-            stmt.setString(5, client.getAdresse());
+        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, client.getNom());
+            stmt.setString(2, client.getTelephone());
+            stmt.setString(3, client.getEmail());
+            stmt.setString(4, client.getAdresse());
             
             int rows = stmt.executeUpdate();
-            return rows > 0;
+            if (rows > 0) {
+                ResultSet generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int generatedId = generatedKeys.getInt(1);
+                    client.setId(String.valueOf(generatedId));
+                }
+                return true;
+            }
+            return false;
         } catch (SQLException e) {
             System.err.println("Erreur lors de l'ajout du client: " + e.getMessage());
             return false;
@@ -61,7 +68,7 @@ public class ClientDAO {
         String sql = "SELECT * FROM clients WHERE id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, id);
+            stmt.setInt(1, Integer.parseInt(id));
             ResultSet rs = stmt.executeQuery();
             
             if (rs.next()) {
@@ -69,6 +76,8 @@ public class ClientDAO {
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération du client: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.err.println("ID invalide: " + id);
         }
         
         return null;
@@ -85,12 +94,15 @@ public class ClientDAO {
             stmt.setString(2, client.getTelephone());
             stmt.setString(3, client.getEmail());
             stmt.setString(4, client.getAdresse());
-            stmt.setString(5, client.getId());
+            stmt.setInt(5, Integer.parseInt(client.getId()));
             
             int rows = stmt.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
             System.err.println("Erreur lors de la modification du client: " + e.getMessage());
+            return false;
+        } catch (NumberFormatException e) {
+            System.err.println("ID invalide: " + client.getId());
             return false;
         }
     }
@@ -102,12 +114,15 @@ public class ClientDAO {
         String sql = "DELETE FROM clients WHERE id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, id);
+            stmt.setInt(1, Integer.parseInt(id));
             
             int rows = stmt.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
             System.err.println("Erreur lors de la suppression du client: " + e.getMessage());
+            return false;
+        } catch (NumberFormatException e) {
+            System.err.println("ID invalide: " + id);
             return false;
         }
     }
@@ -142,17 +157,61 @@ public class ClientDAO {
      * Afficher un client depuis un ResultSet
      */
     private void afficherClient(ResultSet rs) throws SQLException {
-        System.out.println("ID: " + rs.getString("id") + " | Nom: " + rs.getString("nom") + 
-                          " | Téléphone: " + rs.getString("telephone") + 
-                          " | Email: " + (rs.getString("email") != null ? rs.getString("email") : "N/A") + 
-                          " | Adresse: " + (rs.getString("adresse") != null ? rs.getString("adresse") : "N/A"));
+        System.out.println("═══════════════════════════════════════════════════");
+        System.out.println("ID: " + rs.getInt("id"));
+        System.out.println("Nom: " + rs.getString("nom"));
+        System.out.println("Téléphone: " + rs.getString("telephone"));
+        System.out.println("Email: " + (rs.getString("email") != null ? rs.getString("email") : "N/A"));
+        System.out.println("Adresse: " + (rs.getString("adresse") != null ? rs.getString("adresse") : "N/A"));
+        System.out.println("═══════════════════════════════════════════════════");
+    }
+
+    /**
+     * Vérifier si un client existe par téléphone
+     */
+    public Client getClientByTelephone(String telephone) {
+        String sql = "SELECT * FROM clients WHERE telephone = ?";
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, telephone);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return mapResultSetToClient(rs);
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la recherche du client: " + e.getMessage());
+        }
+        
+        return null;
+    }
+
+    /**
+     * Vérifier si un client existe par nom et téléphone
+     */
+    public Client getClientByNomEtTelephone(String nom, String telephone) {
+        String sql = "SELECT * FROM clients WHERE nom = ? AND telephone = ?";
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, nom);
+            stmt.setString(2, telephone);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return mapResultSetToClient(rs);
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la recherche du client: " + e.getMessage());
+        }
+        
+        return null;
     }
 
     /**
      * Mapper un ResultSet vers un objet Client
      */
     private Client mapResultSetToClient(ResultSet rs) throws SQLException {
-        String id = rs.getString("id");
+        String id = String.valueOf(rs.getInt("id"));
         String nom = rs.getString("nom");
         String telephone = rs.getString("telephone");
         String email = rs.getString("email");
@@ -161,5 +220,4 @@ public class ClientDAO {
         
         return new Client(id, nom, telephone, email, adresse, dateCreation);
     }
-
 }
