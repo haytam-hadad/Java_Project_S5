@@ -1,3 +1,14 @@
+import dao.VehiculeDAO;
+import dao.ClientDAO;
+import dao.VenteDAO;
+import dao.DatabaseConnection;
+import menu.MenuVehicules;
+import menu.MenuClients;
+import menu.MenuRecherche;
+import menu.MenuRapports;
+import util.ColorUtil;
+import util.ConsoleUtil;
+
 public class Main {
     private static VehiculeDAO vehiculeDAO = new VehiculeDAO();
     private static ClientDAO clientDAO = new ClientDAO();

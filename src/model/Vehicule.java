@@ -1,3 +1,6 @@
+package model;
+
+import util.ColorUtil;
 public class Vehicule {
     protected String id;   
     protected String marque;
@@ -81,3 +84,5 @@ public class Vehicule {
         }
     }
 }
+
+

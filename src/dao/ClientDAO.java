@@ -1,4 +1,9 @@
+package dao;
+
 import java.sql.*;
+
+import model.Client;
+import util.ColorUtil;
 
 /**
  * Data Access Object pour la gestion des clients
@@ -203,3 +208,5 @@ public class ClientDAO {
         return new Client(id, nom, telephone, email, adresse, dateCreation);
     }
 }
+
+

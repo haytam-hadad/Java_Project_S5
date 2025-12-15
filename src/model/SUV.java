@@ -1,3 +1,7 @@
+package model;
+
+import util.ColorUtil;
+
 public class SUV extends Vehicule {
     
     public SUV(String id, String marque, String modele, double prixAchat, double prixVente,

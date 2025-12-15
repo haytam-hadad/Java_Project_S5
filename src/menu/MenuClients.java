@@ -1,3 +1,10 @@
+package menu;
+
+import dao.ClientDAO;
+import model.Client;
+import util.ColorUtil;
+import util.ConsoleUtil;
+
 public class MenuClients {
 
     public static void afficherMenu(ClientDAO clientDAO) {

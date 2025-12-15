@@ -1,4 +1,9 @@
+package dao;
+
 import java.sql.*;
+
+import model.Vehicule;
+import util.ColorUtil;
 
 /**
  * Data Access Object pour la gestion des véhicules
@@ -284,3 +289,5 @@ public class VehiculeDAO {
         }
     }
 }
+
+

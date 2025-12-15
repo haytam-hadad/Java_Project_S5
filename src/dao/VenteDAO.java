@@ -1,4 +1,10 @@
+package dao;
+
 import java.sql.*;
+
+import model.Vehicule;
+import model.Client;
+import util.ColorUtil;
 
 /**
  * Data Access Object pour la gestion des ventes
@@ -125,3 +131,5 @@ public class VenteDAO {
     }
 
 }
+
+

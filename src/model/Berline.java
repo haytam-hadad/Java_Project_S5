@@ -1,3 +1,7 @@
+package model;
+
+import util.ColorUtil;
+
 public class Berline extends Vehicule {
     
     public Berline(String id, String marque, String modele, double prixAchat, double prixVente,
@@ -17,4 +21,5 @@ public class Berline extends Vehicule {
         super.Afficher();
     }
 }
+
 

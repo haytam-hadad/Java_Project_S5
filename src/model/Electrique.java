@@ -1,3 +1,7 @@
+package model;
+
+import util.ColorUtil;
+
 public class Electrique extends Vehicule {
     
     public Electrique(String id, String marque, String modele, double prixAchat, double prixVente,

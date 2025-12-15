@@ -1,3 +1,7 @@
+package model;
+
+import util.ColorUtil;
+
 public class Camion extends Vehicule {
     
     public Camion(String id, String marque, String modele, double prixAchat, double prixVente,

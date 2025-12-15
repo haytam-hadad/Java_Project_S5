@@ -1,3 +1,9 @@
+package menu;
+
+import dao.VehiculeDAO;
+import util.ColorUtil;
+import util.ConsoleUtil;
+
 public class MenuRecherche {
 
     public static void afficherMenu(VehiculeDAO vehiculeDAO) {

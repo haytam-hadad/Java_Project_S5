@@ -1,3 +1,10 @@
+package menu;
+
+import dao.VehiculeDAO;
+import dao.VenteDAO;
+import util.ColorUtil;
+import util.ConsoleUtil;
+
 public class MenuRapports {
 
     public static void afficherMenu(VehiculeDAO vehiculeDAO, VenteDAO venteDAO) {

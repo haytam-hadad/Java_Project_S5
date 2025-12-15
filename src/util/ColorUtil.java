@@ -1,3 +1,5 @@
+package util;
+
 /**
  * Utility class for terminal colors using ANSI escape codes
  */
@@ -22,7 +24,7 @@ public class ColorUtil {
     public static final String MAGENTA_BOLD = "\033[1;35m";
     public static final String CYAN_BOLD    = "\033[1;36m";
     public static final String WHITE_BOLD   = "\033[1;37m";
-    
+
     /**
      * Color a text with the specified color
      */

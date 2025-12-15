@@ -1,4 +1,18 @@
+package menu;
+
 import java.util.Calendar;
+
+import dao.VehiculeDAO;
+import dao.ClientDAO;
+import dao.VenteDAO;
+import model.Vehicule;
+import model.Berline;
+import model.SUV;
+import model.Camion;
+import model.Electrique;
+import model.Client;
+import util.ColorUtil;
+import util.ConsoleUtil;
 
 public class MenuVehicules {
 

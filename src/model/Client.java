@@ -1,4 +1,8 @@
+package model;
+
 import java.sql.Timestamp;
+
+import util.ColorUtil;
 
 /**
  * Classe représentant un client
@@ -54,6 +58,5 @@ public class Client {
                           ColorUtil.colorize((adresse != null ? adresse : "N/A"), adresse != null ? ColorUtil.CYAN : ColorUtil.WHITE));
     }
 }
-
 
 
