@@ -130,6 +130,178 @@ public class VenteDAO {
         }
     }
 
+    /**
+     * Afficher l'historique complet des ventes (format simple)
+     */
+    public void afficherHistoriqueVentes() {
+        String sql = "SELECT v.id as vente_id, v.prix_vente_final, v.date_vente, v.mode_paiement, v.notes, " +
+                     "ve.id as vehicule_id, ve.marque, ve.modele, ve.annee, ve.type_vehicule, " +
+                     "c.id as client_id, c.nom, c.telephone " +
+                     "FROM ventes v " +
+                     "INNER JOIN vehicules ve ON v.vehicule_id = ve.id " +
+                     "INNER JOIN clients c ON v.client_id = c.id " +
+                     "ORDER BY v.date_vente DESC";
+        
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            System.out.println("\n" + ColorUtil.title("=== HISTORIQUE DES VENTES ===\n"));
+            
+            boolean hasData = false;
+            int compteur = 0;
+            double totalVentes = 0;
+            
+            while (rs.next()) {
+                hasData = true;
+                compteur++;
+                double prix = rs.getDouble("prix_vente_final");
+                totalVentes += prix;
+                
+                System.out.println(ColorUtil.colorize("VENTE #" + compteur, ColorUtil.YELLOW_BOLD) + 
+                                 ColorUtil.colorize(" - " + rs.getTimestamp("date_vente"), ColorUtil.WHITE));
+                
+                System.out.println(ColorUtil.colorize("  Véhicule: ", ColorUtil.CYAN) + 
+                                 ColorUtil.colorize(rs.getString("marque") + " " + rs.getString("modele") + 
+                                 " (" + rs.getInt("annee") + ")", ColorUtil.YELLOW) +
+                                 ColorUtil.colorize(" [" + rs.getString("type_vehicule") + "]", ColorUtil.MAGENTA));
+                
+                System.out.println(ColorUtil.colorize("  Client:   ", ColorUtil.CYAN) + 
+                                 ColorUtil.colorize(rs.getString("nom"), ColorUtil.YELLOW) +
+                                 ColorUtil.colorize(" - " + rs.getString("telephone"), ColorUtil.WHITE));
+                
+                System.out.println(ColorUtil.colorize("  Prix:     ", ColorUtil.CYAN) + 
+                                 ColorUtil.colorize(String.format("%.2f DH", prix), ColorUtil.GREEN_BOLD) +
+                                 ColorUtil.colorize(" - " + rs.getString("mode_paiement"), ColorUtil.WHITE));
+                
+                String notes = rs.getString("notes");
+                if (notes != null && !notes.isEmpty()) {
+                    System.out.println(ColorUtil.colorize("  Notes:    ", ColorUtil.CYAN) + 
+                                     ColorUtil.colorize(notes, ColorUtil.WHITE));
+                }
+                
+                System.out.println();
+            }
+            
+            if (!hasData) {
+                System.out.println(ColorUtil.warning("Aucune vente enregistrée pour le moment."));
+            } else {
+                System.out.println(ColorUtil.colorize("─────────────────────────────────────────", ColorUtil.CYAN));
+                System.out.println(ColorUtil.colorize("Total des ventes: ", ColorUtil.CYAN_BOLD) + 
+                                 ColorUtil.highlight(String.valueOf(compteur)) +
+                                 ColorUtil.colorize(" | Chiffre d'affaires: ", ColorUtil.CYAN_BOLD) +
+                                 ColorUtil.colorize(String.format("%.2f DH", totalVentes), ColorUtil.GREEN_BOLD));
+                System.out.println(ColorUtil.colorize("─────────────────────────────────────────", ColorUtil.CYAN));
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la récupération de l'historique des ventes: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Afficher l'historique des ventes d'un véhicule spécifique
+     */
+    public void afficherHistoriqueVehicule(int vehiculeId) {
+        String sql = "SELECT v.id as vente_id, v.prix_vente_final, v.date_vente, v.mode_paiement, v.notes, " +
+                     "ve.marque, ve.modele, ve.annee, ve.type_vehicule, " +
+                     "c.nom, c.telephone " +
+                     "FROM ventes v " +
+                     "INNER JOIN vehicules ve ON v.vehicule_id = ve.id " +
+                     "INNER JOIN clients c ON v.client_id = c.id " +
+                     "WHERE v.vehicule_id = ? " +
+                     "ORDER BY v.date_vente DESC";
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, vehiculeId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                System.out.println("\n" + ColorUtil.title("=== HISTORIQUE VENTE - VÉHICULE ID " + vehiculeId + " ==="));
+                System.out.println(ColorUtil.colorize("═══════════════════════════════════════════════════════════════", ColorUtil.CYAN));
+                
+                System.out.println(ColorUtil.colorize("Véhicule: ", ColorUtil.CYAN) + 
+                                 ColorUtil.colorize(rs.getString("marque") + " " + rs.getString("modele"), ColorUtil.YELLOW) +
+                                 ColorUtil.colorize(" (" + rs.getInt("annee") + ")", ColorUtil.WHITE));
+                System.out.println(ColorUtil.colorize("Type: ", ColorUtil.CYAN) + ColorUtil.colorize(rs.getString("type_vehicule"), ColorUtil.MAGENTA));
+                System.out.println(ColorUtil.colorize("Prix de vente: ", ColorUtil.CYAN) + 
+                                 ColorUtil.colorize(String.format("%.2f", rs.getDouble("prix_vente_final")), ColorUtil.GREEN_BOLD) + " DH");
+                System.out.println(ColorUtil.colorize("Client: ", ColorUtil.CYAN) + ColorUtil.colorize(rs.getString("nom"), ColorUtil.YELLOW));
+                System.out.println(ColorUtil.colorize("Téléphone: ", ColorUtil.CYAN) + ColorUtil.highlight(rs.getString("telephone")));
+                System.out.println(ColorUtil.colorize("Mode de paiement: ", ColorUtil.CYAN) + ColorUtil.highlight(rs.getString("mode_paiement")));
+                System.out.println(ColorUtil.colorize("Date de vente: ", ColorUtil.CYAN) + ColorUtil.highlight(rs.getTimestamp("date_vente").toString()));
+                
+                String notes = rs.getString("notes");
+                if (notes != null && !notes.isEmpty()) {
+                    System.out.println(ColorUtil.colorize("Notes: ", ColorUtil.CYAN) + ColorUtil.colorize(notes, ColorUtil.WHITE));
+                }
+                
+                System.out.println(ColorUtil.colorize("═══════════════════════════════════════════════════════════════", ColorUtil.CYAN));
+            } else {
+                System.out.println(ColorUtil.warning("Aucune vente trouvée pour ce véhicule."));
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la récupération de l'historique: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Afficher l'historique des achats d'un client
+     */
+    public void afficherHistoriqueClient(int clientId) {
+        String sql = "SELECT v.id as vente_id, v.prix_vente_final, v.date_vente, v.mode_paiement, v.notes, " +
+                     "ve.id as vehicule_id, ve.marque, ve.modele, ve.annee, ve.type_vehicule, " +
+                     "c.nom " +
+                     "FROM ventes v " +
+                     "INNER JOIN vehicules ve ON v.vehicule_id = ve.id " +
+                     "INNER JOIN clients c ON v.client_id = c.id " +
+                     "WHERE v.client_id = ? " +
+                     "ORDER BY v.date_vente DESC";
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, clientId);
+            ResultSet rs = stmt.executeQuery();
+            
+            boolean hasData = false;
+            int compteur = 0;
+            String nomClient = null;
+            
+            System.out.println("\n" + ColorUtil.title("=== HISTORIQUE ACHATS - CLIENT ID " + clientId + " ==="));
+            
+            while (rs.next()) {
+                if (!hasData) {
+                    nomClient = rs.getString("nom");
+                    System.out.println(ColorUtil.colorize("Client: ", ColorUtil.CYAN_BOLD) + ColorUtil.colorize(nomClient, ColorUtil.YELLOW));
+                    System.out.println(ColorUtil.colorize("═══════════════════════════════════════════════════════════════", ColorUtil.CYAN));
+                }
+                hasData = true;
+                compteur++;
+                
+                System.out.println("\n" + ColorUtil.colorize("ACHAT #" + compteur, ColorUtil.YELLOW_BOLD));
+                System.out.println(ColorUtil.colorize("   • Véhicule: ", ColorUtil.CYAN) + 
+                                 ColorUtil.colorize(rs.getString("marque") + " " + rs.getString("modele"), ColorUtil.YELLOW) +
+                                 ColorUtil.colorize(" (" + rs.getInt("annee") + ")", ColorUtil.WHITE));
+                System.out.println(ColorUtil.colorize("   • Type: ", ColorUtil.CYAN) + ColorUtil.colorize(rs.getString("type_vehicule"), ColorUtil.MAGENTA));
+                System.out.println(ColorUtil.colorize("   • Prix payé: ", ColorUtil.CYAN) + 
+                                 ColorUtil.colorize(String.format("%.2f", rs.getDouble("prix_vente_final")), ColorUtil.GREEN_BOLD) + " DH");
+                System.out.println(ColorUtil.colorize("   • Mode de paiement: ", ColorUtil.CYAN) + ColorUtil.highlight(rs.getString("mode_paiement")));
+                System.out.println(ColorUtil.colorize("   • Date: ", ColorUtil.CYAN) + ColorUtil.highlight(rs.getTimestamp("date_vente").toString()));
+                
+                String notes = rs.getString("notes");
+                if (notes != null && !notes.isEmpty()) {
+                    System.out.println(ColorUtil.colorize("   • Notes: ", ColorUtil.CYAN) + ColorUtil.colorize(notes, ColorUtil.WHITE));
+                }
+            }
+            
+            if (!hasData) {
+                System.out.println(ColorUtil.warning("Aucun achat trouvé pour ce client."));
+            } else {
+                System.out.println("\n" + ColorUtil.colorize("═══════════════════════════════════════════════════════════════", ColorUtil.CYAN));
+                System.out.println(ColorUtil.info("Total des achats: ") + ColorUtil.highlight(String.valueOf(compteur)));
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la récupération de l'historique: " + e.getMessage());
+        }
+    }
 }
-
-

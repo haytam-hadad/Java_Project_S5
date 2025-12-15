@@ -14,6 +14,7 @@ public class MenuRapports {
             System.out.println(ColorUtil.colorize("1. ", ColorUtil.YELLOW) + "Véhicules disponibles");
             System.out.println(ColorUtil.colorize("2. ", ColorUtil.YELLOW) + "Véhicules vendus");
             System.out.println(ColorUtil.colorize("3. ", ColorUtil.YELLOW) + "Statistiques de ventes");
+            System.out.println(ColorUtil.colorize("4. ", ColorUtil.YELLOW) + "Historique complet des ventes (Véhicules + Clients + Paiements)");
             System.out.println(ColorUtil.colorize("0. ", ColorUtil.RED) + "Retour au menu principal");
             System.out.print(ColorUtil.info("Votre choix: "));
 
@@ -29,6 +30,9 @@ public class MenuRapports {
                 case 3:
                     venteDAO.afficherStatistiques();
                     break;
+                case 4:
+                    venteDAO.afficherHistoriqueVentes();
+                    break;
                 case 0:
                     continuer = false;
                     break;
@@ -43,5 +47,3 @@ public class MenuRapports {
         vehiculeDAO.afficherVehiculesVendus();
     }
 }
-
-
