@@ -1,13 +1,9 @@
 package dao;
 
 import java.sql.*;
-
-import model.Vehicule;
+import model.*;
 import util.ColorUtil;
 
-/**
- * Data Access Object pour la gestion des véhicules
- */
 public class VehiculeDAO {
     private Connection connection;
 
@@ -15,12 +11,11 @@ public class VehiculeDAO {
         this.connection = DatabaseConnection.getInstance().getConnection();
     }
 
-    /**
-     * Ajouter un véhicule à la base de données
-     */
     public boolean ajouterVehicule(Vehicule vehicule) {
         String sql = "INSERT INTO vehicules (marque, modele, prix_achat, prix_vente, annee, " +
-                     "kilometrage, type_vehicule, statut, date_ajout) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                     "kilometrage, type_vehicule, statut, date_ajout, capacite_coffre, traction, " +
+                     "capacite_chargement, autonomie_km, temps_charge_heures) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?)";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, vehicule.getMarque());
@@ -32,12 +27,44 @@ public class VehiculeDAO {
             stmt.setString(7, vehicule.getTypeVehicule());
             stmt.setString(8, vehicule.getStatut());
             
+            // Attributs spécifiques selon le type
+            if (vehicule instanceof Berline) {
+                stmt.setInt(9, ((Berline) vehicule).getCapaciteCoffre());
+                stmt.setNull(10, Types.VARCHAR);
+                stmt.setNull(11, Types.DECIMAL);
+                stmt.setNull(12, Types.INTEGER);
+                stmt.setNull(13, Types.DECIMAL);
+            } else if (vehicule instanceof SUV) {
+                stmt.setNull(9, Types.INTEGER);
+                stmt.setString(10, ((SUV) vehicule).getTraction());
+                stmt.setNull(11, Types.DECIMAL);
+                stmt.setNull(12, Types.INTEGER);
+                stmt.setNull(13, Types.DECIMAL);
+            } else if (vehicule instanceof Camion) {
+                stmt.setNull(9, Types.INTEGER);
+                stmt.setNull(10, Types.VARCHAR);
+                stmt.setDouble(11, ((Camion) vehicule).getCapaciteChargement());
+                stmt.setNull(12, Types.INTEGER);
+                stmt.setNull(13, Types.DECIMAL);
+            } else if (vehicule instanceof Electrique) {
+                stmt.setNull(9, Types.INTEGER);
+                stmt.setNull(10, Types.VARCHAR);
+                stmt.setNull(11, Types.DECIMAL);
+                stmt.setInt(12, ((Electrique) vehicule).getAutonomieKm());
+                stmt.setDouble(13, ((Electrique) vehicule).getTempsChargeHeures());
+            } else {
+                stmt.setNull(9, Types.INTEGER);
+                stmt.setNull(10, Types.VARCHAR);
+                stmt.setNull(11, Types.DECIMAL);
+                stmt.setNull(12, Types.INTEGER);
+                stmt.setNull(13, Types.DECIMAL);
+            }
+            
             int rows = stmt.executeUpdate();
             if (rows > 0) {
                 ResultSet generatedKeys = stmt.getGeneratedKeys();
                 if (generatedKeys.next()) {
-                    int generatedId = generatedKeys.getInt(1);
-                    vehicule.setId(String.valueOf(generatedId));
+                    vehicule.setId(String.valueOf(generatedKeys.getInt(1)));
                 }
                 return true;
             }
@@ -48,9 +75,6 @@ public class VehiculeDAO {
         }
     }
 
-    /**
-     * Afficher tous les véhicules
-     */
     public void afficherTousVehicules() {
         String sql = "SELECT * FROM vehicules ORDER BY date_ajout DESC";
         
@@ -60,7 +84,10 @@ public class VehiculeDAO {
             boolean hasData = false;
             while (rs.next()) {
                 hasData = true;
-                afficherVehicule(rs);
+                Vehicule v = mapResultSetToVehicule(rs);
+                if (v != null) {
+                    v.Afficher();
+                }
             }
             
             if (!hasData) {
@@ -71,9 +98,6 @@ public class VehiculeDAO {
         }
     }
 
-    /**
-     * Afficher les véhicules disponibles
-     */
     public void afficherVehiculesDisponibles() {
         String sql = "SELECT * FROM vehicules WHERE statut = 'DISPONIBLE' ORDER BY date_ajout DESC";
         
@@ -83,7 +107,10 @@ public class VehiculeDAO {
             boolean hasData = false;
             while (rs.next()) {
                 hasData = true;
-                afficherVehicule(rs);
+                Vehicule v = mapResultSetToVehicule(rs);
+                if (v != null) {
+                    v.Afficher();
+                }
             }
             
             if (!hasData) {
@@ -94,9 +121,6 @@ public class VehiculeDAO {
         }
     }
 
-    /**
-     * Afficher les véhicules vendus
-     */
     public void afficherVehiculesVendus() {
         String sql = "SELECT * FROM vehicules WHERE statut = 'VENDU' ORDER BY date_vende DESC";
         
@@ -129,9 +153,6 @@ public class VehiculeDAO {
         }
     }
 
-    /**
-     * Récupérer un véhicule par son ID
-     */
     public Vehicule getVehiculeById(int id) {
         String sql = "SELECT * FROM vehicules WHERE id = ?";
         
@@ -149,15 +170,11 @@ public class VehiculeDAO {
         return null;
     }
 
-    /**
-     * Supprimer un véhicule
-     */
     public boolean supprimerVehicule(int id) {
         String sql = "DELETE FROM vehicules WHERE id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
-            
             int rows = stmt.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
@@ -166,9 +183,6 @@ public class VehiculeDAO {
         }
     }
 
-    /**
-     * Rechercher et afficher des véhicules par critères
-     */
     public void rechercherEtAfficherVehicules(String marque, String typeVehicule, Double prixMax, Integer anneeMin) {
         StringBuilder sql = new StringBuilder("SELECT * FROM vehicules WHERE 1=1");
         
@@ -206,7 +220,10 @@ public class VehiculeDAO {
             boolean hasData = false;
             while (rs.next()) {
                 hasData = true;
-                afficherVehicule(rs);
+                Vehicule v = mapResultSetToVehicule(rs);
+                if (v != null) {
+                    v.Afficher();
+                }
             }
             
             if (!hasData) {
@@ -217,38 +234,6 @@ public class VehiculeDAO {
         }
     }
 
-    /**
-     * Afficher un véhicule depuis un ResultSet
-     */
-    private void afficherVehicule(ResultSet rs) throws SQLException {
-        String statut = rs.getString("statut");
-        String statutColor = getStatutColor(statut);
-        System.out.print(ColorUtil.colorize("ID=", ColorUtil.CYAN) + ColorUtil.highlight(String.valueOf(rs.getInt("id"))) + 
-                        ColorUtil.colorize(" ||  ", ColorUtil.WHITE) + 
-                        ColorUtil.colorize(rs.getString("marque") + " " + rs.getString("modele"), ColorUtil.YELLOW) + 
-                        ColorUtil.colorize(" (", ColorUtil.WHITE) + ColorUtil.highlight(String.valueOf(rs.getInt("annee"))) + 
-                        ColorUtil.colorize(") ||  Km=", ColorUtil.WHITE) + ColorUtil.highlight(String.valueOf(rs.getInt("kilometrage"))) +
-                        ColorUtil.colorize(" ||  Achat=", ColorUtil.WHITE) + ColorUtil.colorize(String.format("%.2f", rs.getDouble("prix_achat")), ColorUtil.GREEN) + 
-                        ColorUtil.colorize(" ||  Vente=", ColorUtil.WHITE) + ColorUtil.colorize(String.format("%.2f", rs.getDouble("prix_vente")), ColorUtil.GREEN) +
-                        ColorUtil.colorize(" ||  Type=", ColorUtil.WHITE) + ColorUtil.colorize(rs.getString("type_vehicule"), ColorUtil.MAGENTA) + 
-                        ColorUtil.colorize(" ||  Statut=", ColorUtil.WHITE) + statutColor);
-        System.out.println();
-    }
-    
-    private String getStatutColor(String statut) {
-        switch (statut.toUpperCase()) {
-            case "DISPONIBLE":
-                return ColorUtil.colorize(statut, ColorUtil.GREEN_BOLD);
-            case "VENDU":
-                return ColorUtil.colorize(statut, ColorUtil.RED_BOLD);
-            default:
-                return ColorUtil.colorize(statut, ColorUtil.WHITE);
-        }
-    }
-
-    /**
-     * Mapper un ResultSet vers un objet Vehicule
-     */
     private Vehicule mapResultSetToVehicule(ResultSet rs) throws SQLException {
         String id = String.valueOf(rs.getInt("id"));
         String marque = rs.getString("marque");
@@ -265,13 +250,35 @@ public class VehiculeDAO {
         String dateAjoutStr = dateAjout != null ? dateAjout.toString() : null;
         String dateVenteStr = dateVente != null ? dateVente.toString() : null;
         
-        return new Vehicule(id, marque, modele, prixAchat, prixVente, annee, kilometrage, 
-                           typeVehicule, statut, dateAjoutStr, dateVenteStr);
+        // Créer l'objet spécifique selon le type
+        switch (typeVehicule) {
+            case "BERLINE":
+                int capaciteCoffre = rs.getInt("capacite_coffre");
+                return new Berline(id, marque, modele, prixAchat, prixVente, annee, kilometrage, 
+                                  statut, dateAjoutStr, dateVenteStr, capaciteCoffre);
+            
+            case "SUV":
+                String traction = rs.getString("traction");
+                return new SUV(id, marque, modele, prixAchat, prixVente, annee, kilometrage, 
+                              statut, dateAjoutStr, dateVenteStr, traction);
+            
+            case "CAMION":
+                double capaciteChargement = rs.getDouble("capacite_chargement");
+                return new Camion(id, marque, modele, prixAchat, prixVente, annee, kilometrage, 
+                                 statut, dateAjoutStr, dateVenteStr, capaciteChargement);
+            
+            case "ELECTRIQUE":
+                int autonomieKm = rs.getInt("autonomie_km");
+                double tempsChargeHeures = rs.getDouble("temps_charge_heures");
+                return new Electrique(id, marque, modele, prixAchat, prixVente, annee, kilometrage, 
+                                     statut, dateAjoutStr, dateVenteStr, autonomieKm, tempsChargeHeures);
+            
+            default:
+                return new Vehicule(id, marque, modele, prixAchat, prixVente, annee, kilometrage, 
+                                   typeVehicule, statut, dateAjoutStr, dateVenteStr);
+        }
     }
 
-    /**
-     * Modifier un véhicule
-     */
     public boolean modifierVehicule(Vehicule vehicule) {
         String sql = "UPDATE vehicules SET statut = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -289,5 +296,3 @@ public class VehiculeDAO {
         }
     }
 }
-
-

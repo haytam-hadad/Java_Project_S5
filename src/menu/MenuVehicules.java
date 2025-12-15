@@ -1,16 +1,10 @@
 package menu;
 
-import java.util.Calendar;
-
-import dao.VehiculeDAO;
 import dao.ClientDAO;
+import dao.VehiculeDAO;
 import dao.VenteDAO;
-import model.Vehicule;
-import model.Berline;
-import model.SUV;
-import model.Camion;
-import model.Electrique;
-import model.Client;
+import java.util.Calendar;
+import model.*;
 import util.ColorUtil;
 import util.ConsoleUtil;
 
@@ -60,7 +54,6 @@ public class MenuVehicules {
 
         System.out.print(ColorUtil.info("Marque: "));
         String marque = ConsoleUtil.SCANNER.nextLine().trim();
-
         if (marque.isEmpty()) {
             System.out.println(ColorUtil.error("Erreur: La marque ne peut pas être vide!"));
             return;
@@ -68,7 +61,6 @@ public class MenuVehicules {
 
         System.out.print(ColorUtil.info("Modèle: "));
         String modele = ConsoleUtil.SCANNER.nextLine().trim();
-
         if (modele.isEmpty()) {
             System.out.println(ColorUtil.error("Erreur: Le modèle ne peut pas être vide!"));
             return;
@@ -87,7 +79,7 @@ public class MenuVehicules {
             System.out.println(ColorUtil.error("Erreur: Le prix de vente doit être positif!"));
             return;
         }
-        if (prixVente <= prixAchat) {
+        if (prixVente < prixAchat) {
             System.out.println(ColorUtil.error("Erreur: Le prix de vente doit être supérieur au prix d'achat!"));
             return;
         }
@@ -127,23 +119,91 @@ public class MenuVehicules {
         }
 
         Vehicule vehicule = null;
+        
         switch (typeVehicule) {
             case "BERLINE":
+                System.out.print(ColorUtil.info("Capacité du coffre (en litres): "));
+                int capaciteCoffre;
+                try {
+                    capaciteCoffre = Integer.parseInt(ConsoleUtil.SCANNER.nextLine());
+                    if (capaciteCoffre <= 0) {
+                        System.out.println(ColorUtil.error("Erreur: La capacité doit être positive!"));
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println(ColorUtil.error("Erreur: Capacité invalide!"));
+                    return;
+                }
                 vehicule = new Berline(null, marque, modele, prixAchat, prixVente, annee,
-                        kilometrage, "DISPONIBLE", null, null);
+                        kilometrage, "DISPONIBLE", null, null, capaciteCoffre);
                 break;
+                
             case "SUV":
+                System.out.println("\n" + ColorUtil.info("Type de traction:"));
+                System.out.println(ColorUtil.colorize("1. ", ColorUtil.YELLOW) + "4x4");
+                System.out.println(ColorUtil.colorize("2. ", ColorUtil.YELLOW) + "4x2");
+                System.out.print(ColorUtil.info("Votre choix: "));
+                int choixTraction = ConsoleUtil.lireChoix();
+                String traction;
+                if (choixTraction == 1) {
+                    traction = "4x4";
+                } else if (choixTraction == 2) {
+                    traction = "4x2";
+                } else {
+                    System.out.println(ColorUtil.error("Choix invalide!"));
+                    return;
+                }
                 vehicule = new SUV(null, marque, modele, prixAchat, prixVente, annee,
-                        kilometrage, "DISPONIBLE", null, null);
+                        kilometrage, "DISPONIBLE", null, null, traction);
                 break;
+                
             case "CAMION":
+                System.out.print(ColorUtil.info("Capacité de chargement (en tonnes): "));
+                double capaciteChargement;
+                try {
+                    capaciteChargement = Double.parseDouble(ConsoleUtil.SCANNER.nextLine());
+                    if (capaciteChargement <= 0) {
+                        System.out.println(ColorUtil.error("Erreur: La capacité doit être positive!"));
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println(ColorUtil.error("Erreur: Capacité invalide!"));
+                    return;
+                }
                 vehicule = new Camion(null, marque, modele, prixAchat, prixVente, annee,
-                        kilometrage, "DISPONIBLE", null, null);
+                        kilometrage, "DISPONIBLE", null, null, capaciteChargement);
                 break;
+                
             case "ELECTRIQUE":
+                System.out.print(ColorUtil.info("Autonomie (en km): "));
+                int autonomieKm;
+                try {
+                    autonomieKm = Integer.parseInt(ConsoleUtil.SCANNER.nextLine());
+                    if (autonomieKm <= 0) {
+                        System.out.println(ColorUtil.error("Erreur: L'autonomie doit être positive!"));
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println(ColorUtil.error("Erreur: Autonomie invalide!"));
+                    return;
+                }
+                
+                System.out.print(ColorUtil.info("Temps de charge (en heures): "));
+                double tempsChargeHeures;
+                try {
+                    tempsChargeHeures = Double.parseDouble(ConsoleUtil.SCANNER.nextLine());
+                    if (tempsChargeHeures <= 0) {
+                        System.out.println(ColorUtil.error("Erreur: Le temps de charge doit être positif!"));
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println(ColorUtil.error("Erreur: Temps de charge invalide!"));
+                    return;
+                }
                 vehicule = new Electrique(null, marque, modele, prixAchat, prixVente, annee,
-                        kilometrage, "DISPONIBLE", null, null);
+                        kilometrage, "DISPONIBLE", null, null, autonomieKm, tempsChargeHeures);
                 break;
+                
             default:
                 System.out.println(ColorUtil.error("Type de véhicule inconnu."));
                 return;
@@ -322,5 +382,3 @@ public class MenuVehicules {
         }
     }
 }
-
-

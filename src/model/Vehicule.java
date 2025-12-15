@@ -1,6 +1,7 @@
 package model;
 
 import util.ColorUtil;
+
 public class Vehicule {
     protected String id;   
     protected String marque;
@@ -14,9 +15,8 @@ public class Vehicule {
     protected String dateAjout;
     protected String dateVente;
 
-    public Vehicule(String id, String marque, String modele,double prixAchat, double prixVente,int annee,
-                    int kilometrage,String typeVehicule, String statut,String dateAjout, String dateVente) 
-    {
+    public Vehicule(String id, String marque, String modele, double prixAchat, double prixVente, int annee,
+                    int kilometrage, String typeVehicule, String statut, String dateAjout, String dateVente) {
         this.id = id;
         this.marque = marque;
         this.modele = modele;
@@ -52,13 +52,8 @@ public class Vehicule {
     public String getDateAjout() { return dateAjout; }
     public String getDateVente() { return dateVente; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setStatut(String statut) {
-        this.statut = statut;
-    }
+    public void setId(String id) { this.id = id; }
+    public void setStatut(String statut) { this.statut = statut; }
 
     public void Afficher() {
         String statutColor = getStatutColor(statut);
@@ -84,5 +79,3 @@ public class Vehicule {
         }
     }
 }
-
-
