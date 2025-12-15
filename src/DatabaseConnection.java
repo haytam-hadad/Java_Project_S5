@@ -1,4 +1,7 @@
 import java.sql.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * Classe simple de gestion de la connexion à la base de données MySQL
@@ -11,7 +14,9 @@ public class DatabaseConnection {
     // Configuration de la base de données
     private static final String URL = "jdbc:mysql://localhost:3306/gestion_voitures";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
+    // Le mot de passe est lu depuis un fichier d'environnement simple (db.env)
+    private static final String ENV_FILE = "db.env";
+    private static final String PASSWORD_KEY = "DB_PASSWORD";
     
     /**
      * Constructeur privé pour le pattern Singleton
@@ -19,7 +24,8 @@ public class DatabaseConnection {
     private DatabaseConnection() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            this.connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            String password = loadPasswordFromEnvFile();
+            this.connection = DriverManager.getConnection(URL, USERNAME, password);
             System.out.println("Connexion à la base de données réussie!");
         } catch (ClassNotFoundException e) {
             System.err.println("Driver MySQL introuvable: " + e.getMessage());
@@ -44,7 +50,8 @@ public class DatabaseConnection {
     public Connection getConnection() {
         try {
             if (connection == null || connection.isClosed()) {
-                connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+                String password = loadPasswordFromEnvFile();
+                connection = DriverManager.getConnection(URL, USERNAME, password);
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération de la connexion: " + e.getMessage());
@@ -75,5 +82,26 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             return false;
         }
+    }
+
+    /**
+     * Lit le mot de passe MySQL depuis le fichier db.env (clé DB_PASSWORD).
+     * Si le fichier ou la clé n'existent pas, retourne une chaîne vide (comportement actuel).
+     */
+    private String loadPasswordFromEnvFile() {
+        String password = "";
+        try (BufferedReader reader = new BufferedReader(new FileReader(ENV_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.startsWith(PASSWORD_KEY + "=")) {
+                    password = line.substring((PASSWORD_KEY + "=").length());
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            // Fichier absent ou problème de lecture : on garde le mot de passe vide par défaut
+        }
+        return password;
     }
 }

@@ -64,11 +64,11 @@ public class ClientDAO {
     /**
      * Récupérer un client par son ID
      */
-    public Client getClientById(String id) {
+    public Client getClientById(int id) {
         String sql = "SELECT * FROM clients WHERE id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, Integer.parseInt(id));
+            stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             
             if (rs.next()) {
@@ -76,8 +76,6 @@ public class ClientDAO {
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération du client: " + e.getMessage());
-        } catch (NumberFormatException e) {
-            System.err.println("ID invalide: " + id);
         }
         
         return null;

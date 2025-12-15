@@ -127,11 +127,11 @@ public class VehiculeDAO {
     /**
      * Récupérer un véhicule par son ID
      */
-    public Vehicule getVehiculeById(String id) {
+    public Vehicule getVehiculeById(int id) {
         String sql = "SELECT * FROM vehicules WHERE id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, Integer.parseInt(id));
+            stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             
             if (rs.next()) {
@@ -139,49 +139,24 @@ public class VehiculeDAO {
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération du véhicule: " + e.getMessage());
-        } catch (NumberFormatException e) {
-            System.err.println("ID invalide: " + id);
         }
         
         return null;
     }
 
     /**
-     * Marquer un véhicule comme vendu
-     */
-    public boolean marquerCommeVendu(String id) {
-        String sql = "UPDATE vehicules SET statut = 'VENDU', date_vende = NOW() WHERE id = ?";
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, Integer.parseInt(id));
-            
-            int rows = stmt.executeUpdate();
-            return rows > 0;
-        } catch (SQLException e) {
-            System.err.println("Erreur lors de la vente du véhicule: " + e.getMessage());
-            return false;
-        } catch (NumberFormatException e) {
-            System.err.println("ID invalide: " + id);
-            return false;
-        }
-    }
-
-    /**
      * Supprimer un véhicule
      */
-    public boolean supprimerVehicule(String id) {
+    public boolean supprimerVehicule(int id) {
         String sql = "DELETE FROM vehicules WHERE id = ?";
         
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, Integer.parseInt(id));
+            stmt.setInt(1, id);
             
             int rows = stmt.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
             System.err.println("Erreur lors de la suppression du véhicule: " + e.getMessage());
-            return false;
-        } catch (NumberFormatException e) {
-            System.err.println("ID invalide: " + id);
             return false;
         }
     }
@@ -191,23 +166,18 @@ public class VehiculeDAO {
      */
     public void rechercherEtAfficherVehicules(String marque, String typeVehicule, Double prixMax, Integer anneeMin) {
         StringBuilder sql = new StringBuilder("SELECT * FROM vehicules WHERE 1=1");
-        int paramCount = 0;
         
         if (marque != null && !marque.isEmpty()) {
             sql.append(" AND marque LIKE ?");
-            paramCount++;
         }
         if (typeVehicule != null && !typeVehicule.isEmpty()) {
             sql.append(" AND type_vehicule = ?");
-            paramCount++;
         }
         if (prixMax != null) {
             sql.append(" AND prix_vente <= ?");
-            paramCount++;
         }
         if (anneeMin != null) {
             sql.append(" AND annee >= ?");
-            paramCount++;
         }
         
         sql.append(" ORDER BY date_ajout DESC");

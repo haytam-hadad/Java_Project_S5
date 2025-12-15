@@ -26,3 +26,16 @@ CREATE TABLE clients (
     adresse TEXT,
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Table ventes (historique des ventes de véhicules)
+CREATE TABLE IF NOT EXISTS ventes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    vehicule_id INT NOT NULL,
+    client_id INT NOT NULL,
+    prix_vente_final DECIMAL(10,2) NOT NULL,
+    date_vente TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    mode_paiement ENUM('COMPTANT', 'CREDIT', 'CHEQUE') DEFAULT 'COMPTANT',
+    notes TEXT,
+    FOREIGN KEY (vehicule_id) REFERENCES vehicules(id) ON DELETE CASCADE,
+    FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
+);
