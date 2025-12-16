@@ -79,3 +79,16 @@ CREATE TABLE ventes (
         REFERENCES clients(id)
         ON DELETE CASCADE
 );
+
+INSERT INTO ventes (
+    id,
+    vehicule_id,
+    client_id,
+    prix_vente_final,
+    date_vente,
+    mode_paiement,
+    notes
+) VALUES
+(1, 2, 1, 215000.00, '2025-12-16 10:15:00', 'COMPTANT', 'Vente rapide sans négociation'),
+(2, 3, 2, 108000.00, '2025-12-16 11:30:00', 'CHEQUE', 'Léger rabais accordé'),
+(3, 7, 4, 10000.00, '2025-12-16 14:00:00', 'CREDIT', 'Paiement en plusieurs mensualités');
