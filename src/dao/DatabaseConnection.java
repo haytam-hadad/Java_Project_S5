@@ -18,7 +18,7 @@ public class DatabaseConnection {
     // Configuration de la base de données
     private static final String URL = "jdbc:mysql://localhost:3306/gestion_voitures";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = ""; // Mettre le mot de passe ici si nécessaire
+    private static final String PASSWORD = "";
 
     /**
      * Constructeur privé (Singleton)
